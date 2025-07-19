@@ -1,0 +1,95 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password?: string | null;
+  role: string | null;
+  blocked: boolean;
+  profilePic?: string | null;
+  mobileNumber?: string | null;
+  dateofBirth: string | null;
+  gender: string | null;
+  height: string | null;
+  weight: string | null;
+  provider?: string | null;
+  fcm_token?: string | null;
+  googleId?: string | null;
+  facebookId?: string | null;
+  createdAt?: string | null;
+}
+
+export interface Purchase {
+  id: string;
+  userId: string;
+  productName: string;
+  amount: number;
+  currency: string;
+  status: 'completed' | 'pending' | 'failed';
+  createdAt: string;
+}
+
+export interface Article {
+  id: string;
+  title: Record<string, string>;
+  description: Record<string, string>;
+  imageUrl: string;
+  status: 'draft' | 'scheduled' | 'published' | 'unpublished';
+  createdAt: string;
+  updatedAt: string;
+  scheduledAt?: string;
+  languages: string[];
+}
+
+export interface Language {
+  code: string;
+  name: string;
+  isActive: boolean;
+}
+
+export interface DashboardStats {
+  dailyActiveUsers: number;
+  dailyNewUsers: number;
+  totalUsers: number;
+  totalRevenue: number;
+  premiumUsers: number;
+}
+
+export interface ChartData {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  }[];
+}
+
+export interface ExerciseDay {
+  id: string;
+  date: string;
+  isRestDay: boolean;
+  exercises: Exercise[];
+  completionPercentage: number;
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  sets: number;
+  reps: number;
+  weight?: number;
+  duration?: number;
+}
+
+export interface ApiIssue {
+  id: string;
+  requestId: string;
+  endpoint: string;
+  method: string;
+  statusCode: number;
+  errorMessage: string;
+  requestData: any;
+  responseData: any;
+  timestamp: string;
+}
