@@ -1,21 +1,76 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import { Users, UserPlus, TrendingUp, DollarSign, Crown } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { Chart } from '../Charts/Chart';
+import { dailyActiveUsers, dailyNewUsers } from '../../api/adminPanelAPI';
+import Swal from 'sweetalert2';
 
 export const Dashboard: React.FC = () => {
+
+  const [activeUser, setActiveUser] = useState(0);
+  const [dailyUser, setDailyUser] = useState(0);
+
+  useEffect(() => {
+    dailyActiveUsers().then((res) => {
+      if (res.status == 200) {
+        const activeUsers = res.data["Active Users"];
+        setActiveUser(activeUsers)
+      }
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+    dailyNewUsers().then((res) => {
+      if (res.status == 200) {
+        const newUsers = res.data["New Users"];
+        setDailyUser(newUsers)
+      }
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+  }, []);
+
   const stats = [
     {
       title: 'Daily Active Users',
-      value: '2,847',
+      value: activeUser || 0,
       change: '+12% from yesterday',
       changeType: 'positive' as const,
       icon: Users,
       color: 'blue' as const,
     },
     {
-      title: 'New Users Today',
-      value: '156',
+      title: 'Users Today',
+      value: dailyUser || 0,
       change: '+8% from yesterday',
       changeType: 'positive' as const,
       icon: UserPlus,

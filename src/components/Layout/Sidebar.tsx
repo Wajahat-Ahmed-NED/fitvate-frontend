@@ -15,7 +15,6 @@ const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: Home },
   { path: '/users', label: 'User Management', icon: Users },
   { path: '/articles', label: 'Articles', icon: FileText },
-  { path: '/analytics', label: 'Analytics', icon: BarChart3 },
   { path: '/issues', label: 'Issues', icon: AlertCircle },
   { path: '/settings', label: 'Settings', icon: Settings },
 ];

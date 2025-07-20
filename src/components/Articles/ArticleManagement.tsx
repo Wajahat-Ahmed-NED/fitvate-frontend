@@ -1,23 +1,22 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, Edit, Trash2, Globe, Languages } from 'lucide-react';
+import React, { useState,useEffect } from 'react';
+import { Plus, Search, Edit, Trash2, Globe, Languages } from 'lucide-react';
 import { Article, Language } from '../../types';
 import { ArticleModal } from './ArticleModal';
 import { clsx } from 'clsx';
+import { getAllLanguages } from '../../api/adminPanelAPI';
+import Swal from 'sweetalert2';
+// import { LanguageModal } from '../Settings/LanguageModal';
 
 export const ArticleManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'view' | 'edit' | 'create'>('view');
-
-  const languages: Language[] = [
-    { code: 'en', name: 'English', isActive: true },
-    { code: 'es', name: 'Spanish', isActive: true },
-    { code: 'fr', name: 'French', isActive: true },
-    { code: 'de', name: 'German', isActive: false },
-  ];
-
+  // const [languageModalMode, setLanguageModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  // const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
+  const [languages, setLanguages] = useState<Language[] | []>([]);  
   const [articles] = useState<Article[]>([
     {
       id: '1',
@@ -55,6 +54,31 @@ export const ArticleManagement: React.FC = () => {
     },
   ]);
 
+  useEffect(()=>{
+    getAllLanguages().then((res)=>{
+      if (res.status == 200) {
+              setLanguages(res.data.data)
+            }
+          }).catch((err) => {
+            Swal.fire({
+              title: 'Error!',
+              text: `${err.data.message}`,
+              timer: 5000,
+              icon: 'error',
+              width: '300px',
+              padding: '1rem',
+              customClass: {
+                popup: 'p-4 rounded-md shadow-md',
+                title: 'text-lg font-semibold',
+                htmlContainer: 'text-sm',
+                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+              },
+              confirmButtonText: 'Okay',
+              buttonsStyling: false, // required to use Tailwind styles
+            })
+          });
+  },[])
+
   const filteredArticles = articles.filter(article => {
     const matchesSearch = Object.values(article.title).some(title =>
       title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -69,6 +93,12 @@ export const ArticleManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // const handleAddLanguage = () => {
+  //   setLanguageToBeModified(null);
+  //   setLanguageModalMode('create');
+  //   setIsLanguageModalOpen(true);
+  // };
+
   const handleEditArticle = (article: Article) => {
     setSelectedArticle(article);
     setModalMode('edit');
@@ -79,6 +109,11 @@ export const ArticleManagement: React.FC = () => {
     setIsModalOpen(false);
     setSelectedArticle(null);
   };
+
+  // const handleCloseLanguageModal = () => {
+  //   setIsLanguageModalOpen(false);
+  //   setLanguageToBeModified(null);
+  // };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,6 +134,14 @@ export const ArticleManagement: React.FC = () => {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Article Management</h2>
+        <div className='flex flex-row gap-4'>
+        {/* <button
+          onClick={handleAddLanguage}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Language</span>
+        </button> */}
         <button
           onClick={handleCreateArticle}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
@@ -106,6 +149,7 @@ export const ArticleManagement: React.FC = () => {
           <Plus className="w-4 h-4" />
           <span>Create Article</span>
         </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
@@ -128,8 +172,8 @@ export const ArticleManagement: React.FC = () => {
             >
               <option value="all">All Languages</option>
               {languages.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.name}
+                <option key={lang.locale} value={lang.locale}>
+                  {lang.language}
                 </option>
               ))}
             </select>
@@ -227,6 +271,15 @@ export const ArticleManagement: React.FC = () => {
           onClose={handleCloseModal}
         />
       )}
+{/* 
+      {isLanguageModalOpen && (
+        <LanguageModal
+          language={languageToBeModified}
+          mode={languageModalMode}
+          onClose={handleCloseLanguageModal}
+        />
+      )} */}
+
     </div>
   );
 };

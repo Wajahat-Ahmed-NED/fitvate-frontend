@@ -5,6 +5,7 @@ import { Dashboard } from './components/Dashboard/Dashboard';
 import { UserManagement } from './components/Users/UserManagement';
 import { ArticleManagement } from './components/Articles/ArticleManagement';
 import { IssueTracker } from './components/Issues/IssueTracker';
+import { Settings } from './components/Settings/settings';
 
 function App() {
   return (
@@ -19,8 +20,8 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/users" element={<UserManagement />} />
               <Route path="/articles" element={<ArticleManagement />} />
-              <Route path="/analytics" element={<Dashboard />} />
               <Route path="/issues" element={<IssueTracker />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </main>
         </div>

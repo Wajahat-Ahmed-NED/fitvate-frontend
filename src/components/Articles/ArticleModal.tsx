@@ -142,10 +142,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       className="px-3 py-1 border border-gray-300 rounded text-sm"
                     >
                       {selectedLanguages.map(langCode => {
-                        const lang = languages.find(l => l.code === langCode);
+                        const lang = languages.find(l => l.locale === langCode);
                         return (
                           <option key={langCode} value={langCode}>
-                            {lang?.name || langCode}
+                            {lang?.language || langCode}
                           </option>
                         );
                       })}
@@ -214,21 +214,21 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 </label>
                 <div className="space-y-2">
                   {languages.map((lang) => (
-                    <div key={lang.code} className="flex items-center space-x-2">
+                    <div key={lang.locale} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id={`lang-${lang.code}`}
-                        checked={selectedLanguages.includes(lang.code)}
-                        onChange={() => handleLanguageToggle(lang.code)}
+                        id={`lang-${lang.locale}`}
+                        checked={selectedLanguages.includes(lang.locale)}
+                        onChange={() => handleLanguageToggle(lang.locale)}
                         disabled={isReadonly}
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                       <label
-                        htmlFor={`lang-${lang.code}`}
+                        htmlFor={`lang-${lang.locale}`}
                         className="text-sm font-medium text-gray-700 flex items-center space-x-2"
                       >
                         <Languages className="w-4 h-4 text-gray-400" />
-                        <span>{lang.name}</span>
+                        <span>{lang.language}</span>
                       </label>
                     </div>
                   ))}
@@ -239,14 +239,14 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Translation Status</h3>
                 <div className="space-y-2">
                   {selectedLanguages.map(langCode => {
-                    const lang = languages.find(l => l.code === langCode);
+                    const lang = languages.find(l => l.locale === langCode);
                     const hasTitle = formData.title[langCode];
                     const hasDescription = formData.description[langCode];
                     const isComplete = hasTitle && hasDescription;
                     
                     return (
                       <div key={langCode} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{lang?.name || langCode}</span>
+                        <span className="text-sm text-gray-600">{lang?.language || langCode}</span>
                         <span className={clsx(
                           'px-2 py-1 text-xs rounded-full',
                           isComplete

@@ -41,8 +41,9 @@ export interface Article {
 }
 
 export interface Language {
-  code: string;
-  name: string;
+  id: number | null;
+  locale: string;
+  language: string;
   isActive: boolean;
 }
 
