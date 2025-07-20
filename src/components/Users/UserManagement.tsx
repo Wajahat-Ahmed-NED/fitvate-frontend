@@ -3,7 +3,7 @@ import { Search, Filter, Edit, Trash2, Ban, CheckCircle, Eye } from 'lucide-reac
 import { User } from '../../types';
 import { UserModal } from './UserModal';
 import { clsx } from 'clsx';
-import { listUsers, toggleBlock } from '../../api/adminPanelAPI';
+import { deleteProfile, listUsers, toggleBlock } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { debounce } from 'lodash';
 
@@ -116,6 +116,46 @@ export const UserManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const handleDeleteUser = (user: User) => {
+    deleteProfile(user).then((res) => {
+      if (res.status == 200) {
+        Swal.fire({
+          title: 'Success!',
+          text: `${res.data.message}`,
+          timer: 5000,
+          icon: 'success',
+          width: '300px',
+          padding: '1rem',
+          customClass: {
+            popup: 'p-4 rounded-md shadow-md',
+            title: 'text-lg font-semibold',
+            htmlContainer: 'text-sm',
+            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+          },
+          confirmButtonText: 'Okay',
+          buttonsStyling: false, // required to use Tailwind styles
+        })
+      }
+      fetchUsers(pagination.page);
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+  };
   
   const handleBlockUser = (user: User) => {
     toggleBlock({
@@ -314,7 +354,7 @@ export const UserManagement: React.FC = () => {
                           >
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-900 p-1 rounded transition-colors" title='Delete User'>
+                          <button onClick={() => handleDeleteUser(user)} className="text-red-600 hover:text-red-900 p-1 rounded transition-colors" title='Delete User'>
                             <Trash2 className="w-4 h-4" />
                           </button>
                           <button 

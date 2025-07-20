@@ -2,175 +2,216 @@ import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Languages, Plus, Edit, Eye, Trash2 } from 'lucide-react';
 import { Language } from '../../types';
 import { clsx } from 'clsx';
-import { getAllLanguages } from '../../api/adminPanelAPI';
+import { deleteLanguage, getAllLanguages } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { LanguageModal } from './LanguageModal';
 
 export const Settings: React.FC = () => {
 
-    const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
-    const [languageModalMode, setLanguageModalMode] = useState<'view' | 'edit' | 'create'>('create');
-    const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
-    const [languages, setLanguages] = React.useState<Language[]>([]);
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [languageModalMode, setLanguageModalMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
+  const [languages, setLanguages] = React.useState<Language[]>([]);
 
-    useEffect(()=>{
-        fetchLanguages();
-      },[])
+  useEffect(() => {
+    fetchLanguages();
+  }, [])
 
-    const fetchLanguages = () =>{
-        getAllLanguages().then((res)=>{
-          if (res.status == 200) {
-                  setLanguages(res.data.data)
-                }
-              }).catch((err) => {
-                Swal.fire({
-                  title: 'Error!',
-                  text: `${err.data.message}`,
-                  timer: 5000,
-                  icon: 'error',
-                  width: '300px',
-                  padding: '1rem',
-                  customClass: {
-                    popup: 'p-4 rounded-md shadow-md',
-                    title: 'text-lg font-semibold',
-                    htmlContainer: 'text-sm',
-                    confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
-                  },
-                  confirmButtonText: 'Okay',
-                  buttonsStyling: false, // required to use Tailwind styles
-                })
-              });
-    }
+  const fetchLanguages = () => {
+    getAllLanguages().then((res) => {
+      if (res.status == 200) {
+        setLanguages(res.data.data)
+      }
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+  }
 
-    const handleAddLanguage = () => {
-        setLanguageToBeModified(null);
-        setLanguageModalMode('create');
-        setIsLanguageModalOpen(true);
-    };
+  const handleAddLanguage = () => {
+    setLanguageToBeModified(null);
+    setLanguageModalMode('create');
+    setIsLanguageModalOpen(true);
+  };
 
-    const handleViewLanguage = (language: Language) => {
-        setLanguageToBeModified(language);
-        setLanguageModalMode('view');
-        setIsLanguageModalOpen(true);
-    };
+  const handleViewLanguage = (language: Language) => {
+    setLanguageToBeModified(language);
+    setLanguageModalMode('view');
+    setIsLanguageModalOpen(true);
+  };
 
-    const handleEditLanguage = (language: Language) => {
-        setLanguageToBeModified(language);
-        setLanguageModalMode('edit');
-        setIsLanguageModalOpen(true);
-    };
+  const handleEditLanguage = (language: Language) => {
+    setLanguageToBeModified(language);
+    setLanguageModalMode('edit');
+    setIsLanguageModalOpen(true);
+  };
+
+  const handleDeleteLanguage = (language: Language) => {
+    deleteLanguage(language).then((res) => {
+      if (res.status == 200) {
+        Swal.fire({
+          title: 'Success!',
+          text: `${res.data.message}`,
+          timer: 5000,
+          icon: 'success',
+          width: '300px',
+          padding: '1rem',
+          customClass: {
+            popup: 'p-4 rounded-md shadow-md',
+            title: 'text-lg font-semibold',
+            htmlContainer: 'text-sm',
+            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+          },
+          confirmButtonText: 'Okay',
+          buttonsStyling: false, // required to use Tailwind styles
+        })
+      }
+      fetchLanguages();
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+  };
 
 
-    const handleCloseLanguageModal = () => {
-        setIsLanguageModalOpen(false);
-        setLanguageToBeModified(null);
-    };
+  const handleCloseLanguageModal = () => {
+    setIsLanguageModalOpen(false);
+    setLanguageToBeModified(null);
+  };
 
-    return (
-        <div className="p-6 space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Settings</h2>
-                <p className="text-gray-600">Manage your application settings and preferences</p>
+  return (
+    <div className="p-6 space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Settings</h2>
+        <p className="text-gray-600">Manage your application settings and preferences</p>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <Languages className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Languages</h3>
+                <p className="text-sm text-gray-600">Manage supported languages for the application</p>
+              </div>
             </div>
+            <button onClick={handleAddLanguage} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
+              <Plus className="w-4 h-4" />
+              <span>Add Language</span>
+            </button>
+          </div>
+        </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-indigo-100 rounded-lg">
-                                <Languages className="w-5 h-5 text-indigo-600" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-gray-900">Languages</h3>
-                                <p className="text-sm text-gray-600">Manage supported languages for the application</p>
-                            </div>
-                        </div>
-                        <button onClick={handleAddLanguage} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2">
-                            <Plus className="w-4 h-4" />
-                            <span>Add Language</span>
-                        </button>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Locale
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Language
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {languages.map((language) => (
+                <tr key={language.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {language.id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                      {language.locale}
+                    </code>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center space-x-2">
+                      <Languages className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-medium text-gray-900">{language.language}</span>
                     </div>
-                </div>
-
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    ID
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Locale
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Language
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {languages.map((language) => (
-                                <tr key={language.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {language.id}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                                            {language.locale}
-                                        </code>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center space-x-2">
-                                            <Languages className="w-4 h-4 text-gray-400" />
-                                            <span className="text-sm font-medium text-gray-900">{language.language}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={clsx(
-                                            'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                                            language.isActive
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
-                                        )}>
-                                            {language.isActive ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <div className="flex space-x-2">
-                                            <button onClick={()=>handleViewLanguage(language)} className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            <button onClick={()=>handleEditLanguage(language)} className="text-gray-600 hover:text-gray-900 p-1 rounded transition-colors">
-                                                <Edit className="w-4 h-4" />
-                                            </button>
-                                            <button className="text-red-600 hover:text-red-900 p-1 rounded transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={clsx(
+                      'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                      language.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    )}>
+                      {language.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2">
+                      <button title='View Language' onClick={() => handleViewLanguage(language)} className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors">
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button title='Edit Language' onClick={() => handleEditLanguage(language)} className="text-gray-600 hover:text-gray-900 p-1 rounded transition-colors">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button title='Delete Language' onClick={() => handleDeleteLanguage(language)} className="text-red-600 hover:text-red-900 p-1 rounded transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
 
-            {isLanguageModalOpen && (
-                <LanguageModal
-                    language={languageToBeModified}
-                    mode={languageModalMode}
-                    onClose={handleCloseLanguageModal}
-                    onRefresh={fetchLanguages}
-                />
-            )}
+      {isLanguageModalOpen && (
+        <LanguageModal
+          language={languageToBeModified}
+          mode={languageModalMode}
+          onClose={handleCloseLanguageModal}
+          onRefresh={fetchLanguages}
+        />
+      )}
 
-            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center space-x-3 mb-4">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -291,6 +332,6 @@ export const Settings: React.FC = () => {
           Save Changes
         </button>
       </div> */}
-        </div>
-    );
+    </div>
+  );
 };

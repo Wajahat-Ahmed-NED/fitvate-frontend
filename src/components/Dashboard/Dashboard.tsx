@@ -94,38 +94,38 @@ export const Dashboard: React.FC = () => {
     },
   ];
 
-  const userGrowthData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'New Users',
-        data: [650, 590, 800, 810, 560, 550],
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderColor: 'rgb(59, 130, 246)',
-        borderWidth: 2,
-      },
-      {
-        label: 'Active Users',
-        data: [1200, 1900, 3000, 5000, 2000, 3000],
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        borderColor: 'rgb(16, 185, 129)',
-        borderWidth: 2,
-      },
-    ],
-  };
+  // const userGrowthData = {
+  //   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  //   datasets: [
+  //     {
+  //       label: 'New Users',
+  //       data: [650, 590, 800, 810, 560, 550],
+  //       backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  //       borderColor: 'rgb(59, 130, 246)',
+  //       borderWidth: 2,
+  //     },
+  //     {
+  //       label: 'Active Users',
+  //       data: [1200, 1900, 3000, 5000, 2000, 3000],
+  //       backgroundColor: 'rgba(16, 185, 129, 0.1)',
+  //       borderColor: 'rgb(16, 185, 129)',
+  //       borderWidth: 2,
+  //     },
+  //   ],
+  // };
 
-  const revenueData = {
-    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-    datasets: [
-      {
-        label: 'Revenue ($)',
-        data: [12000, 15000, 8000, 20000],
-        backgroundColor: 'rgba(245, 158, 11, 0.8)',
-        borderColor: 'rgb(245, 158, 11)',
-        borderWidth: 1,
-      },
-    ],
-  };
+  // const revenueData = {
+  //   labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+  //   datasets: [
+  //     {
+  //       label: 'Revenue ($)',
+  //       data: [12000, 15000, 8000, 20000],
+  //       backgroundColor: 'rgba(245, 158, 11, 0.8)',
+  //       borderColor: 'rgb(245, 158, 11)',
+  //       borderWidth: 1,
+  //     },
+  //   ],
+  // };
 
   return (
     <div className="p-6 space-y-6">

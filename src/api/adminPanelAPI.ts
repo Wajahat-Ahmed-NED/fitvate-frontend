@@ -43,8 +43,8 @@ async function updateProfile(user: User) {
   );
 }
 
-async function deleteProfile(userId: string) {
-  return await axios.delete(`${api}/admin/user/${userId}`, {
+async function deleteProfile(user: User) {
+  return await axios.delete(`${api}/admin/user/${user.id}`, {
     headers: {
       Authorization: `Bearer ${adminToken}`
     }

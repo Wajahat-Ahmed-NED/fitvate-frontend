@@ -5,7 +5,7 @@ import { Dashboard } from './components/Dashboard/Dashboard';
 import { UserManagement } from './components/Users/UserManagement';
 import { ArticleManagement } from './components/Articles/ArticleManagement';
 import { IssueTracker } from './components/Issues/IssueTracker';
-import { Settings } from './components/Settings/settings';
+import { Settings } from './components/Settings/Settings';
 
 function App() {
   return (
