@@ -3,6 +3,7 @@ import { User, Language, Article } from '../types';
 
 const api = import.meta.env.VITE_fitvateBackend as string;
 const adminToken = import.meta.env.VITE_adminToken as string;
+const userId = import.meta.env.VITE_userId as string;
 
 // Define interfaces
 interface ToggleBlockParams {
@@ -152,7 +153,106 @@ async function changeArticleStatus(article: Article){
   });
 }
 
+// ================================
+// ARTICLES
+// ================================
 
+async function getArticles(){
+  return await axios.get(`${api}/users/${userId}/posts?locale=en&pageSize=8`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+
+async function getSingleArticle(article: Article){
+  return await axios.get(`${api}/users/${userId}/posts/${article.id}`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function createArticle(article: Partial<Article>){
+  return await axios.post(`${api}/users/${userId}/posts`,  
+  {
+    title : article.title,
+    body: article.body,
+    imageUrl: article.imageUrl,
+    type: article.type,
+    topic: article.topic,
+    locale: article.locale,
+    category: article.category,
+    source: article.source
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function updateArticle(article: Partial<Article>){
+  return await axios.put(`${api}/users/${userId}/posts/${article.id}`,  
+  {
+    title : article.title,
+    body: article.body,
+    imageUrl: article.imageUrl,
+    type: article.type,
+    topic: article.topic,
+    locale: article.locale,
+    category: article.category,
+    source: article.source
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function deleteArticle(article: Article){
+  return await axios.delete(`${api}/users/${userId}/posts/${article.id}`,  
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function getLikedArticle(article: Article){
+  return await axios.get(`${api}/users/${userId}/liked-articles`,  
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function addLikedArticle(article: Article){
+  return await axios.post(`${api}/users/${userId}/liked-articles`,  
+  {
+    articleId: article.id
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
+
+async function deleteLikedArticle(article: Article){
+  return await axios.post(`${api}/users/${userId}/liked-articles`,  
+  {
+    articleId: article.id
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${adminToken}`
+    }
+  });
+}
 
 export {
   listUsers,
@@ -167,5 +267,13 @@ export {
   addLanguage,
   editLanguage,
   deleteLanguage,
-  changeArticleStatus
+  changeArticleStatus,
+  getArticles,
+  getLikedArticle,
+  getSingleArticle,
+  deleteArticle,
+  deleteLikedArticle,
+  createArticle,
+  updateArticle,
+  addLikedArticle
 };

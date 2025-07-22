@@ -30,14 +30,18 @@ export interface Purchase {
 
 export interface Article {
   id: string;
-  title: Record<string, string>;
-  description: Record<string, string>;
-  imageUrl: string;
-  status: 'draft' | 'scheduled' | 'published' | 'unpublished';
+  title: string; // changed from Record<string, string>
+  body: string;
+  imageUrl: string | null;
+  topic: string;
+  type: string;
+  locale: string;
+  source: string | null;
+  category: string | null;
+  status: 'Draft' | 'Scheduled' | 'Published' | 'Unpublished'; // match API casing
   createdAt: string;
   updatedAt: string;
-  scheduledAt?: string;
-  languages: string[];
+  userId: string;
 }
 
 export interface Language {

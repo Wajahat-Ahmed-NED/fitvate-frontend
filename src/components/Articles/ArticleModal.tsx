@@ -2,25 +2,40 @@ import React, { useState } from 'react';
 import { X, Image, Languages, Wand2 } from 'lucide-react';
 import { Article, Language } from '../../types';
 import { clsx } from 'clsx';
+import { createArticle, updateArticle } from '../../api/adminPanelAPI';
+import Swal from 'sweetalert2';
 
 interface ArticleModalProps {
   article: Article | null;
   mode: 'view' | 'edit' | 'create';
   languages: Language[];
   onClose: () => void;
+  onRefresh: () => void;
 }
 
-export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose }) => {
+export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose, onRefresh }) => {
   const [activeLanguage, setActiveLanguage] = useState('en');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    article?.languages || ['en']
+    //article?.languages || ['en']
+    ['en']
   );
-  const [formData, setFormData] = useState({
-    title: article?.title || { en: '' },
-    description: article?.description || { en: '' },
-    imageUrl: article?.imageUrl || '',
-    status: article?.status || 'draft',
-  });
+  const [formData, setFormData] = useState<Article>({
+  id: article?.id || '',
+  title: article?.title || '',
+  body: article?.body || '',
+  imageUrl: article?.imageUrl || '',
+  status: article?.status || 'Draft',
+  topic: article?.topic || '',
+  type: article?.type || '',
+  locale: article?.locale || 'en',
+  createdAt: article?.createdAt || new Date().toISOString(),
+  updatedAt: article?.updatedAt || new Date().toISOString(),
+  source: article?.source || '',
+  category: article?.category || '',
+  userId: article?.userId || '',
+});
+
+
 
   const handleLanguageToggle = (langCode: string) => {
     if (selectedLanguages.includes(langCode)) {
@@ -32,30 +47,118 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
   const handleAutoTranslate = () => {
     // Simulate auto-translation
-    const englishTitle = formData.title.en;
-    const englishDescription = formData.description.en;
+    // const englishTitle = formData.title //formData.title.en;
+    // const englishDescription = formData.body;
     
-    const newTitle = { ...formData.title };
-    const newDescription = { ...formData.description };
+    // const newTitle = { ...formData.title };
+    // const newDescription = { ...formData.body };
     
-    selectedLanguages.forEach(langCode => {
-      if (langCode !== 'en') {
-        // Mock translation - in real app, this would call a translation API
-        newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
-        newDescription[langCode] = `[${langCode.toUpperCase()}] ${englishDescription}`;
-      }
-    });
+    // selectedLanguages.forEach(langCode => {
+    //   if (langCode !== 'en') {
+    //     // Mock translation - in real app, this would call a translation API
+    //     newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
+    //     newDescription[langCode] = `[${langCode.toUpperCase()}] ${englishDescription}`;
+    //   }
+    // });
     
-    setFormData({
-      ...formData,
-      title: newTitle,
-      description: newDescription,
-    });
+    // setFormData({
+    //   ...formData,
+    //   title: newTitle,
+    //   description: newDescription,
+    // });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Article submitted:', formData);
+
+    switch (mode) {
+            case 'create':
+
+                createArticle(formData).then((res) => {
+                    if (res.status == 200) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: `${res.data.message || 'Article Created Successfully'}`,
+                            timer: 5000,
+                            icon: 'success',
+                            width: '300px',
+                            padding: '1rem',
+                            customClass: {
+                                popup: 'p-4 rounded-md shadow-md',
+                                title: 'text-lg font-semibold',
+                                htmlContainer: 'text-sm',
+                                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+                            },
+                            confirmButtonText: 'Okay',
+                            buttonsStyling: false, // required to use Tailwind styles
+                        })
+                    }
+                    onRefresh();
+                }).catch((err) => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `${err.data.message || 'Failed to create Article'}`,
+                        timer: 5000,
+                        icon: 'error',
+                        width: '300px',
+                        padding: '1rem',
+                        customClass: {
+                            popup: 'p-4 rounded-md shadow-md',
+                            title: 'text-lg font-semibold',
+                            htmlContainer: 'text-sm',
+                            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+                        },
+                        confirmButtonText: 'Okay',
+                        buttonsStyling: false, // required to use Tailwind styles
+                    })
+                });
+                break;
+            case 'edit':
+
+                updateArticle(formData).then((res) => {
+                    if (res.status == 200) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: `${res.data.message || 'Article Updated Successfully'}`,
+                            timer: 5000,
+                            icon: 'success',
+                            width: '300px',
+                            padding: '1rem',
+                            customClass: {
+                                popup: 'p-4 rounded-md shadow-md',
+                                title: 'text-lg font-semibold',
+                                htmlContainer: 'text-sm',
+                                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+                            },
+                            confirmButtonText: 'Okay',
+                            buttonsStyling: false, // required to use Tailwind styles
+                        })
+                    }
+                    onRefresh();
+                }).catch((err) => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `${err.data.message || 'Failed to update Article'}`,
+                        timer: 5000,
+                        icon: 'error',
+                        width: '300px',
+                        padding: '1rem',
+                        customClass: {
+                            popup: 'p-4 rounded-md shadow-md',
+                            title: 'text-lg font-semibold',
+                            htmlContainer: 'text-sm',
+                            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+                        },
+                        confirmButtonText: 'Okay',
+                        buttonsStyling: false, // required to use Tailwind styles
+                    })
+                });
+                break;
+
+            default:
+                break;
+        }
     onClose();
   };
 
@@ -63,7 +166,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-screen overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
             {mode === 'create' ? 'Create Article' : mode === 'edit' ? 'Edit Article' : 'Article Details'}
@@ -88,7 +191,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     <Image className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="url"
-                      value={formData.imageUrl}
+                      value={formData.imageUrl || ''}
                       onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                       disabled={isReadonly}
                       className={clsx(
@@ -123,10 +226,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     isReadonly && 'bg-gray-50 cursor-not-allowed'
                   )}
                 >
-                  <option value="draft">Draft</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="published">Published</option>
-                  <option value="unpublished">Unpublished</option>
+                  <option value="Draft">Draft</option>
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="Published">Published</option>
+                  <option value="Unpublished">Unpublished</option>
                 </select>
               </div>
 
@@ -170,11 +273,51 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     </label>
                     <input
                       type="text"
-                      value={formData.title[activeLanguage] || ''}
+                      value={formData.title || ''} //formData.title[activeLanguage] 
                       onChange={(e) => setFormData({
                         ...formData,
-                        title: { ...formData.title, [activeLanguage]: e.target.value }
-                      })}
+                        title: e.target.value //{ ...formData.title, [activeLanguage]: e.target.value }
+                      })}       
+                      disabled={isReadonly}
+                      className={clsx(
+                        'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                        isReadonly && 'bg-gray-50 cursor-not-allowed'
+                      )}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Type
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.type || ''} //formData.type[activeLanguage] 
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        type: e.target.value //{ ...formData.type, [activeLanguage]: e.target.value }
+                      })}       
+                      disabled={isReadonly}
+                      className={clsx(
+                        'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                        isReadonly && 'bg-gray-50 cursor-not-allowed'
+                      )}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Topic
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.topic || ''} //formData.topic[activeLanguage] 
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        topic: e.target.value //{ ...formData.topic, [activeLanguage]: e.target.value }
+                      })}       
                       disabled={isReadonly}
                       className={clsx(
                         'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -189,10 +332,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       Description
                     </label>
                     <textarea
-                      value={formData.description[activeLanguage] || ''}
+                      value= {formData.body || ''}//{formData.body[activeLanguage] || ''}
                       onChange={(e) => setFormData({
                         ...formData,
-                        description: { ...formData.description, [activeLanguage]: e.target.value }
+                        body: e.target.value  //{ ...formData.body, [activeLanguage]: e.target.value }
                       })}
                       disabled={isReadonly}
                       rows={6}
@@ -240,8 +383,8 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 <div className="space-y-2">
                   {selectedLanguages.map(langCode => {
                     const lang = languages.find(l => l.locale === langCode);
-                    const hasTitle = formData.title[langCode];
-                    const hasDescription = formData.description[langCode];
+                    const hasTitle = formData.title; //formData.title[langCode];
+                    const hasDescription = formData.body; //formData.body[langCode];
                     const isComplete = hasTitle && hasDescription;
                     
                     return (

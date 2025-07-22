@@ -1,9 +1,9 @@
 import React, { useState,useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Globe, Languages } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Globe, Languages, Eye } from 'lucide-react';
 import { Article, Language } from '../../types';
 import { ArticleModal } from './ArticleModal';
 import { clsx } from 'clsx';
-import { getAllLanguages } from '../../api/adminPanelAPI';
+import { deleteArticle, getAllLanguages, getArticles } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 // import { LanguageModal } from '../Settings/LanguageModal';
 
@@ -17,42 +17,7 @@ export const ArticleManagement: React.FC = () => {
   // const [languageModalMode, setLanguageModalMode] = useState<'view' | 'edit' | 'create'>('create');
   // const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
   const [languages, setLanguages] = useState<Language[] | []>([]);  
-  const [articles] = useState<Article[]>([
-    {
-      id: '1',
-      title: {
-        en: 'Best Workout Routines for Beginners',
-        es: 'Mejores Rutinas de Ejercicio para Principiantes',
-        fr: 'Meilleures Routines d\'Entraînement pour Débutants',
-      },
-      description: {
-        en: 'A comprehensive guide to starting your fitness journey...',
-        es: 'Una guía completa para comenzar tu viaje de fitness...',
-        fr: 'Un guide complet pour commencer votre parcours de fitness...',
-      },
-      imageUrl: 'https://images.pexels.com/photos/416717/pexels-photo-416717.jpeg',
-      status: 'published',
-      createdAt: '2024-01-15T10:30:00Z',
-      updatedAt: '2024-01-16T14:45:00Z',
-      languages: ['en', 'es', 'fr'],
-    },
-    {
-      id: '2',
-      title: {
-        en: 'Nutrition Tips for Athletes',
-        es: 'Consejos de Nutrición para Atletas',
-      },
-      description: {
-        en: 'Essential nutrition guidelines for peak performance...',
-        es: 'Pautas nutricionales esenciales para el máximo rendimiento...',
-      },
-      imageUrl: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg',
-      status: 'draft',
-      createdAt: '2024-01-14T09:15:00Z',
-      updatedAt: '2024-01-14T09:15:00Z',
-      languages: ['en', 'es'],
-    },
-  ]);
+  const [articles, setArticles] = useState<Article[]>([]);
 
   useEffect(()=>{
     getAllLanguages().then((res)=>{
@@ -77,19 +42,92 @@ export const ArticleManagement: React.FC = () => {
               buttonsStyling: false, // required to use Tailwind styles
             })
           });
+    fetchArticles();
   },[])
+
+  const fetchArticles = () => {
+    getArticles().then((res)=>{
+      if (res.status == 200) {
+              setArticles(res.data?.data?.articles)
+            }
+          }).catch((err) => {
+            Swal.fire({
+              title: 'Error!',
+              text: `${err.data.message}`,
+              timer: 5000,
+              icon: 'error',
+              width: '300px',
+              padding: '1rem',
+              customClass: {
+                popup: 'p-4 rounded-md shadow-md',
+                title: 'text-lg font-semibold',
+                htmlContainer: 'text-sm',
+                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+              },
+              confirmButtonText: 'Okay',
+              buttonsStyling: false, // required to use Tailwind styles
+            })
+          });
+  }
+
+  const handleDeleteArticle = (article: Article) => {
+    deleteArticle(article).then((res) => {
+      if (res.status == 200) {
+        Swal.fire({
+          title: 'Success!',
+          text: `${res.data.message || 'Article Deleted Successfully'}`,
+          timer: 5000,
+          icon: 'success',
+          width: '300px',
+          padding: '1rem',
+          customClass: {
+            popup: 'p-4 rounded-md shadow-md',
+            title: 'text-lg font-semibold',
+            htmlContainer: 'text-sm',
+            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+          },
+          confirmButtonText: 'Okay',
+          buttonsStyling: false, // required to use Tailwind styles
+        })
+      }
+      fetchArticles();
+    }).catch((err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: `${err.data.message || 'Failed to delete article'}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md',
+          title: 'text-lg font-semibold',
+          htmlContainer: 'text-sm',
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    });
+  };
 
   const filteredArticles = articles.filter(article => {
     const matchesSearch = Object.values(article.title).some(title =>
       title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const matchesLanguage = selectedLanguage === 'all' || article.languages.includes(selectedLanguage);
+    const matchesLanguage = selectedLanguage === 'all' || 'en'//article.languages.includes(selectedLanguage);
     return matchesSearch && matchesLanguage;
   });
 
   const handleCreateArticle = () => {
     setSelectedArticle(null);
     setModalMode('create');
+    setIsModalOpen(true);
+  };
+
+  const handleViewArticle = (article: Article) => {
+    setSelectedArticle(article);
+    setModalMode('view');
     setIsModalOpen(true);
   };
 
@@ -116,7 +154,7 @@ export const ArticleManagement: React.FC = () => {
   // };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status.toLowerCase()) {
       case 'published':
         return 'bg-green-100 text-green-800';
       case 'draft':
@@ -207,16 +245,16 @@ export const ArticleManagement: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
-                        src={article.imageUrl}
+                        src={article.imageUrl || ''}
                         alt="Article"
                         className="w-12 h-12 rounded-lg object-cover"
                       />
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {article.title.en || Object.values(article.title)[0]}
+                          {article.title || Object.values(article.title)[0]}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {(article.description.en || Object.values(article.description)[0])?.substring(0, 50)}...
+                          {(article.body || Object.values(article.body)[0])?.substring(0, 50)}...
                         </div>
                       </div>
                     </div>
@@ -225,7 +263,8 @@ export const ArticleManagement: React.FC = () => {
                     <div className="flex items-center space-x-1">
                       <Languages className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">
-                        {article.languages.length} language{article.languages.length !== 1 ? 's' : ''}
+                        {article.locale}
+                        {/* {article.languages.length} language{article.languages.length !== 1 ? 's' : ''} */}
                       </span>
                     </div>
                   </td>
@@ -243,17 +282,24 @@ export const ArticleManagement: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
+                        onClick={() => handleViewArticle(article)}
+                        className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
+                        title='View User'
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => handleEditArticle(article)}
                         className="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900 p-1 rounded transition-colors">
+                      <button  onClick={() => handleDeleteArticle(article)} className="text-red-600 hover:text-red-900 p-1 rounded transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900 p-1 rounded transition-colors">
+                      {/* <button className="text-green-600 hover:text-green-900 p-1 rounded transition-colors">
                         <Globe className="w-4 h-4" />
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>
@@ -269,6 +315,7 @@ export const ArticleManagement: React.FC = () => {
           mode={modalMode}
           languages={languages}
           onClose={handleCloseModal}
+          onRefresh={fetchArticles}
         />
       )}
 {/* 
