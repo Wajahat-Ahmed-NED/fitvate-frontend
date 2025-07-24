@@ -31,7 +31,7 @@ export const Sidebar: React.FC = () => {
       </div>
       
       <nav className="space-y-2">
-        {menuItems.map((item) => {
+        {menuItems?.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
           

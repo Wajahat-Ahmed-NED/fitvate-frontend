@@ -12,14 +12,14 @@ export const Dashboard: React.FC = () => {
 
   useEffect(() => {
     dailyActiveUsers().then((res) => {
-      if (res.status == 200) {
-        const activeUsers = res.data["Active Users"];
+      if (res?.status == 200) {
+        const activeUsers = res?.data["Active Users"];
         setActiveUser(activeUsers)
       }
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message || 'Failed to fetch active user(s) count.'}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -35,14 +35,14 @@ export const Dashboard: React.FC = () => {
       })
     });
     dailyNewUsers().then((res) => {
-      if (res.status == 200) {
-        const newUsers = res.data["New Users"];
+      if (res?.status == 200) {
+        const newUsers = res?.data["New Users"];
         setDailyUser(newUsers)
       }
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message || 'Failed to fetch daily users count.'}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -130,7 +130,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat) => (
+        {stats?.map((stat) => (
           <StatsCard key={stat.title} {...stat} />
         ))}
       </div>

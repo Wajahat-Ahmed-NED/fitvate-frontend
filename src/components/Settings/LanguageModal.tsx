@@ -28,10 +28,10 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
             case 'create':
 
                 addLanguage(formData).then((res) => {
-                    if (res.status == 200) {
+                    if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
-                            text: `${res.data.message}`,
+                            text: `${res?.data?.message}`,
                             timer: 5000,
                             icon: 'success',
                             width: '300px',
@@ -50,7 +50,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                 }).catch((err) => {
                     Swal.fire({
                         title: 'Error!',
-                        text: `${err.data.message}`,
+                        text: `${err?.data?.message}`,
                         timer: 5000,
                         icon: 'error',
                         width: '300px',
@@ -69,10 +69,10 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
             case 'edit':
 
                 editLanguage(formData).then((res) => {
-                    if (res.status == 200) {
+                    if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
-                            text: `${res.data.message}`,
+                            text: `${res?.data?.message}`,
                             timer: 5000,
                             icon: 'success',
                             width: '300px',
@@ -91,7 +91,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                 }).catch((err) => {
                     Swal.fire({
                         title: 'Error!',
-                        text: `${err.data.message}`,
+                        text: `${err?.data?.message}`,
                         timer: 5000,
                         icon: 'error',
                         width: '300px',
@@ -142,7 +142,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                                         </label>
                                         <input
                                             type="text"
-                                            value={formData.language || ''}
+                                            value={formData?.language || ''}
                                             onChange={(e) => setFormData({
                                                 ...formData,
                                                 language: e.target.value
@@ -161,7 +161,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                                         </label>
                                         <input
                                             type="text"
-                                            value={formData.locale || ''}
+                                            value={formData?.locale || ''}
                                             onChange={(e) => setFormData({
                                                 ...formData,
                                                 locale: e.target.value

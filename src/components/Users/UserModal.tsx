@@ -86,7 +86,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
               <input
                 type="text"
-                value={formData.name}
+                value={formData?.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -100,7 +100,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
               <select
-                value={formData.gender}
+                value={formData?.gender}
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -120,7 +120,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <input
                 type="email"
-                value={formData.email}
+                value={formData?.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -136,7 +136,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
               <input
                 type="text"
-                value={formData.role}
+                value={formData?.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -152,7 +152,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
               <input
                 type="text"
-                value={formData.provider}
+                value={formData?.provider}
                 onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -166,7 +166,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Profile Picture URL</label>
               <input
                 type="text"
-                value={formData.profilePic}
+                value={formData?.profilePic}
                 onChange={(e) => setFormData({ ...formData, profilePic: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -182,7 +182,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
               <input
                 type="text"
-                value={formData.mobileNumber}
+                value={formData?.mobileNumber}
                 onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -196,7 +196,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
               <input
                 type="date"
-                value={formData.dateofBirth}
+                value={formData?.dateofBirth}
                 onChange={(e) => setFormData({ ...formData, dateofBirth: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -210,7 +210,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Height</label>
               <input
                 type="text"
-                value={formData.height}
+                value={formData?.height}
                 onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -224,7 +224,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <label className="block text-sm font-medium text-gray-700 mb-2">Weight</label>
               <input
                 type="text"
-                value={formData.weight}
+                value={formData?.weight}
                 onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                 disabled={isReadonly}
                 className={clsx(
@@ -241,7 +241,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               {/* <input
                 type="checkbox"
                 id="isPremium"
-                checked={formData.isPremium}
+                checked={formData?.isPremium}
                 onChange={(e) => setFormData({ ...formData, isPremium: e.target.checked })}
                 disabled={isReadonly}
                 className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -256,7 +256,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               <input
                 type="checkbox"
                 id="isBlocked"
-                checked={formData.blocked}
+                checked={formData?.blocked}
                 onChange={(e) => setFormData({ ...formData, blocked: e.target.checked })}
                 disabled={isReadonly}
                 className="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
@@ -286,7 +286,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
                   <input
                     type="checkbox"
                     id="isBlocked"
-                    checked={formData.blocked}
+                    checked={formData?.blocked}
                     onChange={(e) => setFormData({ ...formData, blocked: e.target.checked })}
                     disabled={isReadonly}
                     className="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"

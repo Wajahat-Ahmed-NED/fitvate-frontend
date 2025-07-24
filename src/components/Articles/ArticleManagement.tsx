@@ -21,13 +21,13 @@ export const ArticleManagement: React.FC = () => {
 
   useEffect(()=>{
     getAllLanguages().then((res)=>{
-      if (res.status == 200) {
-              setLanguages(res.data.data)
+      if (res?.status == 200) {
+              setLanguages(res?.data?.data)
             }
           }).catch((err) => {
             Swal.fire({
               title: 'Error!',
-              text: `${err.data.message}`,
+              text: `${err?.data?.message || 'Failed to fetch languages'}`,
               timer: 5000,
               icon: 'error',
               width: '300px',
@@ -47,13 +47,13 @@ export const ArticleManagement: React.FC = () => {
 
   const fetchArticles = () => {
     getArticles().then((res)=>{
-      if (res.status == 200) {
-              setArticles(res.data?.data?.articles)
+      if (res?.status == 200) {
+              setArticles(res?.data?.data?.articles)
             }
           }).catch((err) => {
             Swal.fire({
               title: 'Error!',
-              text: `${err.data.message}`,
+              text: `${err?.data?.message || 'Failed to fetch articles.'}`,
               timer: 5000,
               icon: 'error',
               width: '300px',
@@ -72,10 +72,10 @@ export const ArticleManagement: React.FC = () => {
 
   const handleDeleteArticle = (article: Article) => {
     deleteArticle(article).then((res) => {
-      if (res.status == 200) {
+      if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',
-          text: `${res.data.message || 'Article Deleted Successfully'}`,
+          text: `${res?.data?.message || 'Article Deleted Successfully'}`,
           timer: 5000,
           icon: 'success',
           width: '300px',
@@ -94,7 +94,7 @@ export const ArticleManagement: React.FC = () => {
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message || 'Failed to delete article'}`,
+        text: `${err?.data?.message || 'Failed to delete article'}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -112,10 +112,10 @@ export const ArticleManagement: React.FC = () => {
   };
 
   const filteredArticles = articles.filter(article => {
-    const matchesSearch = Object.values(article.title).some(title =>
+    const matchesSearch = Object.values(article?.title).some(title =>
       title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    const matchesLanguage = selectedLanguage === 'all' || 'en'//article.languages.includes(selectedLanguage);
+    const matchesLanguage = selectedLanguage === 'all' || 'en'//article?.languages.includes(selectedLanguage);
     return matchesSearch && matchesLanguage;
   });
 
@@ -209,7 +209,7 @@ export const ArticleManagement: React.FC = () => {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Languages</option>
-              {languages.map((lang) => (
+              {languages?.map((lang) => (
                 <option key={lang.locale} value={lang.locale}>
                   {lang.language}
                 </option>
@@ -240,21 +240,21 @@ export const ArticleManagement: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredArticles.map((article) => (
-                <tr key={article.id} className="hover:bg-gray-50">
+              {filteredArticles?.map((article) => (
+                <tr key={article?.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
-                        src={article.imageUrl || ''}
+                        src={article?.imageUrl || ''}
                         alt="Article"
                         className="w-12 h-12 rounded-lg object-cover"
                       />
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {article.title || Object.values(article.title)[0]}
+                          {article?.title || Object.values(article?.title)[0]}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {(article.body || Object.values(article.body)[0])?.substring(0, 50)}...
+                          {(article?.body || Object.values(article?.body)[0])?.substring(0, 50)}...
                         </div>
                       </div>
                     </div>
@@ -263,21 +263,21 @@ export const ArticleManagement: React.FC = () => {
                     <div className="flex items-center space-x-1">
                       <Languages className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">
-                        {article.locale}
-                        {/* {article.languages.length} language{article.languages.length !== 1 ? 's' : ''} */}
+                        {article?.locale}
+                        {/* {article?.languages.length} language{article?.languages.length !== 1 ? 's' : ''} */}
                       </span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={clsx(
                       'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                      getStatusColor(article.status)
+                      getStatusColor(article?.status)
                     )}>
-                      {article.status.charAt(0).toUpperCase() + article.status.slice(1)}
+                      {article?.status.charAt(0).toUpperCase() + article?.status.slice(1)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(article.updatedAt).toLocaleDateString()}
+                    {new Date(article?.updatedAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">

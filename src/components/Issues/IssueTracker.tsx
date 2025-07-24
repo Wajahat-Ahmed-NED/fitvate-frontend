@@ -195,7 +195,7 @@ export const IssueTracker: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {issues.map((issue) => (
+              {issues?.map((issue) => (
                 <tr
                   key={issue.id}
                   className="hover:bg-gray-50 cursor-pointer"

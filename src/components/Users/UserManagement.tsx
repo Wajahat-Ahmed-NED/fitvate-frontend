@@ -52,9 +52,9 @@ export const UserManagement: React.FC = () => {
       setLoading(true);
       const response = await listUsers(page);
       console.log(response)
-      setAllUsers(response.data.data);
-      setUsers(response.data.data); 
-      setPagination(response.data.pagination);
+      setAllUsers(response?.data?.data);
+      setUsers(response?.data?.data); 
+      setPagination(response?.data?.pagination);
     } catch (error) {
       console.error('Error fetching users:', error);
       // setUsers([
@@ -118,10 +118,10 @@ export const UserManagement: React.FC = () => {
 
   const handleDeleteUser = (user: User) => {
     deleteProfile(user).then((res) => {
-      if (res.status == 200) {
+      if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',
-          text: `${res.data.message}`,
+          text: `${res?.data?.message}`,
           timer: 5000,
           icon: 'success',
           width: '300px',
@@ -140,7 +140,7 @@ export const UserManagement: React.FC = () => {
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -162,10 +162,10 @@ export const UserManagement: React.FC = () => {
       blockStatus: !user.blocked,
       userId: user.id
     }).then((res)=>{
-      if(res.status==200){
+      if(res?.status==200){
         Swal.fire({
         title: 'Success!',
-        text: `${res.data.message}`,
+        text: `${res?.data?.message}`,
         timer: 5000,
         icon: 'success',
         width: '300px',
@@ -184,7 +184,7 @@ export const UserManagement: React.FC = () => {
     }).catch((err)=>{
         Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -298,7 +298,7 @@ export const UserManagement: React.FC = () => {
                 </thead>
                 {users && 
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {users.map((user) => (
+                  {users?.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">

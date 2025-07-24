@@ -5,7 +5,7 @@ export const useExerciseDay = () => {
   const [exerciseDays, setExerciseDays] = useState<ExerciseDay[]>([]);
 
   const addExerciseToDay = useCallback((dayId: string, exercise: Exercise) => {
-    setExerciseDays(prev => prev.map(day => {
+    setExerciseDays(prev => prev?.map(day => {
       if (day.id === dayId) {
         const updatedExercises = [...day.exercises, exercise];
         return {
@@ -20,7 +20,7 @@ export const useExerciseDay = () => {
   }, []);
 
   const toggleRestDay = useCallback((dayId: string) => {
-    setExerciseDays(prev => prev.map(day => {
+    setExerciseDays(prev => prev?.map(day => {
       if (day.id === dayId) {
         const isRestDay = !day.isRestDay;
         return {
@@ -35,7 +35,7 @@ export const useExerciseDay = () => {
   }, []);
 
   const updateCompletionPercentage = useCallback((dayId: string, percentage: number) => {
-    setExerciseDays(prev => prev.map(day => {
+    setExerciseDays(prev => prev?.map(day => {
       if (day.id === dayId) {
         return {
           ...day,

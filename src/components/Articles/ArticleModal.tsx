@@ -38,8 +38,8 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
 
   const handleLanguageToggle = (langCode: string) => {
-    if (selectedLanguages.includes(langCode)) {
-      setSelectedLanguages(selectedLanguages.filter(code => code !== langCode));
+    if (selectedLanguages?.includes(langCode)) {
+      setSelectedLanguages(selectedLanguages?.filter(code => code !== langCode));
     } else {
       setSelectedLanguages([...selectedLanguages, langCode]);
     }
@@ -47,13 +47,13 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
   const handleAutoTranslate = () => {
     // Simulate auto-translation
-    // const englishTitle = formData.title //formData.title.en;
-    // const englishDescription = formData.body;
+    // const englishTitle = formData?.title //formData?.title.en;
+    // const englishDescription = formData?.body;
     
-    // const newTitle = { ...formData.title };
-    // const newDescription = { ...formData.body };
+    // const newTitle = { ...formData?.title };
+    // const newDescription = { ...formData?.body };
     
-    // selectedLanguages.forEach(langCode => {
+    // selectedLanguages?.forEach(langCode => {
     //   if (langCode !== 'en') {
     //     // Mock translation - in real app, this would call a translation API
     //     newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
@@ -76,10 +76,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
             case 'create':
 
                 createArticle(formData).then((res) => {
-                    if (res.status == 200) {
+                    if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
-                            text: `${res.data.message || 'Article Created Successfully'}`,
+                            text: `${res?.data?.message || 'Article Created Successfully'}`,
                             timer: 5000,
                             icon: 'success',
                             width: '300px',
@@ -98,7 +98,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 }).catch((err) => {
                     Swal.fire({
                         title: 'Error!',
-                        text: `${err.data.message || 'Failed to create Article'}`,
+                        text: `${err?.data?.message || 'Failed to create Article'}`,
                         timer: 5000,
                         icon: 'error',
                         width: '300px',
@@ -117,10 +117,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
             case 'edit':
 
                 updateArticle(formData).then((res) => {
-                    if (res.status == 200) {
+                    if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
-                            text: `${res.data.message || 'Article Updated Successfully'}`,
+                            text: `${res?.data?.message || 'Article Updated Successfully'}`,
                             timer: 5000,
                             icon: 'success',
                             width: '300px',
@@ -139,7 +139,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 }).catch((err) => {
                     Swal.fire({
                         title: 'Error!',
-                        text: `${err.data.message || 'Failed to update Article'}`,
+                        text: `${err?.data?.message || 'Failed to update Article'}`,
                         timer: 5000,
                         icon: 'error',
                         width: '300px',
@@ -191,7 +191,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     <Image className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="url"
-                      value={formData.imageUrl || ''}
+                      value={formData?.imageUrl || ''}
                       onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                       disabled={isReadonly}
                       className={clsx(
@@ -202,10 +202,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     />
                   </div>
                 </div>
-                {formData.imageUrl && (
+                {formData?.imageUrl && (
                   <div className="mt-3">
                     <img
-                      src={formData.imageUrl}
+                      src={formData?.imageUrl}
                       alt="Article preview"
                       className="w-full h-48 object-cover rounded-lg"
                     />
@@ -218,7 +218,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                   Status
                 </label>
                 <select
-                  value={formData.status}
+                  value={formData?.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                   disabled={isReadonly}
                   className={clsx(
@@ -236,7 +236,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <label className="block text-sm font-medium text-gray-700">
-                    Content ({activeLanguage.toUpperCase()})
+                    Content ({activeLanguage?.toUpperCase()})
                   </label>
                   <div className="flex items-center space-x-2">
                     <select
@@ -244,7 +244,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       onChange={(e) => setActiveLanguage(e.target.value)}
                       className="px-3 py-1 border border-gray-300 rounded text-sm"
                     >
-                      {selectedLanguages.map(langCode => {
+                      {selectedLanguages?.map(langCode => {
                         const lang = languages.find(l => l.locale === langCode);
                         return (
                           <option key={langCode} value={langCode}>
@@ -273,10 +273,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     </label>
                     <input
                       type="text"
-                      value={formData.title || ''} //formData.title[activeLanguage] 
+                      value={formData?.title || ''} //formData?.title[activeLanguage] 
                       onChange={(e) => setFormData({
                         ...formData,
-                        title: e.target.value //{ ...formData.title, [activeLanguage]: e.target.value }
+                        title: e.target.value //{ ...formData?.title, [activeLanguage]: e.target.value }
                       })}       
                       disabled={isReadonly}
                       className={clsx(
@@ -293,10 +293,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     </label>
                     <input
                       type="text"
-                      value={formData.type || ''} //formData.type[activeLanguage] 
+                      value={formData?.type || ''} //formData?.type[activeLanguage] 
                       onChange={(e) => setFormData({
                         ...formData,
-                        type: e.target.value //{ ...formData.type, [activeLanguage]: e.target.value }
+                        type: e.target.value //{ ...formData?.type, [activeLanguage]: e.target.value }
                       })}       
                       disabled={isReadonly}
                       className={clsx(
@@ -313,10 +313,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     </label>
                     <input
                       type="text"
-                      value={formData.topic || ''} //formData.topic[activeLanguage] 
+                      value={formData?.topic || ''} //formData?.topic[activeLanguage] 
                       onChange={(e) => setFormData({
                         ...formData,
-                        topic: e.target.value //{ ...formData.topic, [activeLanguage]: e.target.value }
+                        topic: e.target.value //{ ...formData?.topic, [activeLanguage]: e.target.value }
                       })}       
                       disabled={isReadonly}
                       className={clsx(
@@ -332,10 +332,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       Description
                     </label>
                     <textarea
-                      value= {formData.body || ''}//{formData.body[activeLanguage] || ''}
+                      value= {formData?.body || ''}//{formData?.body[activeLanguage] || ''}
                       onChange={(e) => setFormData({
                         ...formData,
-                        body: e.target.value  //{ ...formData.body, [activeLanguage]: e.target.value }
+                        body: e.target.value  //{ ...formData?.body, [activeLanguage]: e.target.value }
                       })}
                       disabled={isReadonly}
                       rows={6}
@@ -356,12 +356,12 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                   Languages
                 </label>
                 <div className="space-y-2">
-                  {languages.map((lang) => (
+                  {languages?.map((lang) => (
                     <div key={lang.locale} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         id={`lang-${lang.locale}`}
-                        checked={selectedLanguages.includes(lang.locale)}
+                        checked={selectedLanguages?.includes(lang.locale)}
                         onChange={() => handleLanguageToggle(lang.locale)}
                         disabled={isReadonly}
                         className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -381,10 +381,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
               <div className="bg-gray-50 rounded-lg p-4">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">Translation Status</h3>
                 <div className="space-y-2">
-                  {selectedLanguages.map(langCode => {
+                  {selectedLanguages?.map(langCode => {
                     const lang = languages.find(l => l.locale === langCode);
-                    const hasTitle = formData.title; //formData.title[langCode];
-                    const hasDescription = formData.body; //formData.body[langCode];
+                    const hasTitle = formData?.title; //formData?.title[langCode];
+                    const hasDescription = formData?.body; //formData?.body[langCode];
                     const isComplete = hasTitle && hasDescription;
                     
                     return (

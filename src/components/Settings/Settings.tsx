@@ -19,13 +19,13 @@ export const Settings: React.FC = () => {
 
   const fetchLanguages = () => {
     getAllLanguages().then((res) => {
-      if (res.status == 200) {
-        setLanguages(res.data.data)
+      if (res?.status == 200) {
+        setLanguages(res?.data?.data)
       }
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message || 'Failed to fetch languages.'}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -62,10 +62,10 @@ export const Settings: React.FC = () => {
 
   const handleDeleteLanguage = (language: Language) => {
     deleteLanguage(language).then((res) => {
-      if (res.status == 200) {
+      if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',
-          text: `${res.data.message}`,
+          text: `${res?.data?.message}`,
           timer: 5000,
           icon: 'success',
           width: '300px',
@@ -84,7 +84,7 @@ export const Settings: React.FC = () => {
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
-        text: `${err.data.message}`,
+        text: `${err?.data?.message}`,
         timer: 5000,
         icon: 'error',
         width: '300px',
@@ -155,7 +155,7 @@ export const Settings: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {languages.map((language) => (
+              {languages?.map((language) => (
                 <tr key={language.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {language.id}
