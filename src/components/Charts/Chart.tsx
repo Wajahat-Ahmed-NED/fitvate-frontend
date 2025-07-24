@@ -32,13 +32,27 @@ interface ChartProps {
   height?: number;
 }
 
-export const Chart: React.FC<ChartProps> = ({ type, data, height = 300 }) => {
+export const Chart: React.FC<ChartProps> = ({ type, data, height = 250 }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+    },
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          boxWidth: 12,
+          padding: 10,
+          font: {
+            size: 11,
+          },
+        },
+      },
+      tooltip: {
+        mode: 'index' as const,
+        intersect: false,
       },
     },
     scales: type !== 'doughnut' ? {
@@ -46,11 +60,21 @@ export const Chart: React.FC<ChartProps> = ({ type, data, height = 300 }) => {
         grid: {
           display: false,
         },
+        ticks: {
+          font: {
+            size: 10,
+          },
+        },
       },
       y: {
         beginAtZero: true,
         grid: {
           color: 'rgba(0, 0, 0, 0.1)',
+        },
+        ticks: {
+          font: {
+            size: 10,
+          },
         },
       },
     } : undefined,
@@ -59,16 +83,15 @@ export const Chart: React.FC<ChartProps> = ({ type, data, height = 300 }) => {
   const chartProps = {
     data,
     options,
-    height,
   };
 
   switch (type) {
     case 'line':
-      return <Line {...chartProps} />;
+      return <div style={{ height: `${height}px` }}><Line {...chartProps} /></div>;
     case 'bar':
-      return <Bar {...chartProps} />;
+      return <div style={{ height: `${height}px` }}><Bar {...chartProps} /></div>;
     case 'doughnut':
-      return <Doughnut {...chartProps} />;
+      return <div style={{ height: `${height}px` }}><Doughnut {...chartProps} /></div>;
     default:
       return null;
   }
