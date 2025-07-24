@@ -1,9 +1,14 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Bell, User, LogOut } from 'lucide-react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { logoutAtom } from '../../store/auth';
 
 export const Header: React.FC = () => {
   const location = useLocation();
+  const logout = useSetAtom(logoutAtom);  
+  const navigate = useNavigate();
+
 
   const getSectionTitle = (pathname: string) => {
     switch (pathname) {
@@ -23,6 +28,11 @@ export const Header: React.FC = () => {
       default:
         return 'Dashboard';
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -48,7 +58,8 @@ export const Header: React.FC = () => {
             </div>
           </div>
           
-          <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout} className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
             <LogOut className="w-5 h-5" />
           </button>
         </div>

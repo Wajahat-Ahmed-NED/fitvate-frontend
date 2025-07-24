@@ -5,9 +5,12 @@ import { ArticleModal } from './ArticleModal';
 import { clsx } from 'clsx';
 import { deleteArticle, getAllLanguages, getArticles } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 // import { LanguageModal } from '../Settings/LanguageModal';
 
 export const ArticleManagement: React.FC = () => {
+  const adminToken = useAtomValue(authTokenAtom);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -20,7 +23,7 @@ export const ArticleManagement: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
 
   useEffect(()=>{
-    getAllLanguages().then((res)=>{
+    getAllLanguages(adminToken).then((res)=>{
       if (res?.status == 200) {
               setLanguages(res?.data?.data)
             }
@@ -46,7 +49,7 @@ export const ArticleManagement: React.FC = () => {
   },[])
 
   const fetchArticles = () => {
-    getArticles().then((res)=>{
+    getArticles(adminToken).then((res)=>{
       if (res?.status == 200) {
               setArticles(res?.data?.data?.articles)
             }
@@ -71,7 +74,7 @@ export const ArticleManagement: React.FC = () => {
   }
 
   const handleDeleteArticle = (article: Article) => {
-    deleteArticle(article).then((res) => {
+    deleteArticle(article, adminToken).then((res) => {
       if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',

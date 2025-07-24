@@ -1,24 +1,13 @@
-export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('authToken');
-  return !!token;
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../store/auth';
+
+// Helper function to get auth header for API requests
+export const useAuthHeader = () => {
+  const token = useAtomValue(authTokenAtom);
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getAuthToken = (): string | null => {
-  return localStorage.getItem('authToken');
-};
-
-export const getUser = (): any | null => {
-  const userStr = localStorage.getItem('user');
-  return userStr ? JSON.parse(userStr) : null;
-};
-
-export const logout = (): void => {
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('user');
-  window.location.href = '/login';
-};
-
-export const setAuthHeader = (): Record<string, string> => {
-  const token = getAuthToken();
+// For non-hook contexts, you can still access the token directly
+export const getAuthHeader = (token: string | null): Record<string, string> => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };

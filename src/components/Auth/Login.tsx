@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
 import { Eye, EyeOff, Lock, Mail, Shield } from 'lucide-react';
 import { clsx } from 'clsx';
+import { adminLogin } from '../../api/adminPanelAPI';
+import { loginAtom } from '../../store/auth';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const login = useSetAtom(loginAtom);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    role: 'admin'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,26 +24,18 @@ export const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Store token in localStorage
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+      adminLogin(formData).then((res)=>{
+        // console.log(res)
+        // localStorage.setItem('authToken', res?.data?.data?.token);
+        login({ token: res?.data?.data?.token });
         // Redirect to dashboard
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Login failed. Please try again.');
-      }
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      })
+      .catch((err)=>{
+        setError(err?.data?.message || 'Login failed. Please try again.')
+      })
     } catch (err) {
       setError('Network error. Please check your connection and try again.');
     } finally {
@@ -58,10 +55,10 @@ export const Login: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+          {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
             <Shield className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Panel</h1>
+          </div> */}
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">FITVATE</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
 
@@ -117,7 +114,7 @@ export const Login: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
                 id="remember-me"
@@ -135,7 +132,7 @@ export const Login: React.FC = () => {
             >
               Forgot password?
             </button>
-          </div>
+          </div> */}
 
           <button
             type="submit"
@@ -152,14 +149,14 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        <div className="mt-8 text-center">
+        {/* <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             Need help?{' '}
             <button className="text-blue-600 hover:text-blue-500 transition-colors">
               Contact Support
             </button>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

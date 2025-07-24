@@ -6,8 +6,11 @@ import { clsx } from 'clsx';
 import { deleteProfile, listUsers, toggleBlock } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { debounce } from 'lodash';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 export const UserManagement: React.FC = () => {
+  const adminToken = useAtomValue(authTokenAtom);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +53,7 @@ export const UserManagement: React.FC = () => {
   const fetchUsers = async (page: number) => {
     try {
       setLoading(true);
-      const response = await listUsers(page);
+      const response = await listUsers(page,adminToken);
       console.log(response)
       setAllUsers(response?.data?.data);
       setUsers(response?.data?.data); 
@@ -117,7 +120,7 @@ export const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = (user: User) => {
-    deleteProfile(user).then((res) => {
+    deleteProfile(user,adminToken).then((res) => {
       if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',
@@ -160,8 +163,8 @@ export const UserManagement: React.FC = () => {
   const handleBlockUser = (user: User) => {
     toggleBlock({
       blockStatus: !user.blocked,
-      userId: user.id
-    }).then((res)=>{
+      userId: user.id,
+    },adminToken).then((res)=>{
       if(res?.status==200){
         Swal.fire({
         title: 'Success!',

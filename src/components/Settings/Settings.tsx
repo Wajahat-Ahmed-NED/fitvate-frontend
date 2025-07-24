@@ -5,9 +5,11 @@ import { clsx } from 'clsx';
 import { deleteLanguage, getAllLanguages } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { LanguageModal } from './LanguageModal';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 export const Settings: React.FC = () => {
-
+  const adminToken = useAtomValue(authTokenAtom);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [languageModalMode, setLanguageModalMode] = useState<'view' | 'edit' | 'create'>('create');
   const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
@@ -18,7 +20,7 @@ export const Settings: React.FC = () => {
   }, [])
 
   const fetchLanguages = () => {
-    getAllLanguages().then((res) => {
+    getAllLanguages(adminToken).then((res) => {
       if (res?.status == 200) {
         setLanguages(res?.data?.data)
       }
@@ -61,7 +63,7 @@ export const Settings: React.FC = () => {
   };
 
   const handleDeleteLanguage = (language: Language) => {
-    deleteLanguage(language).then((res) => {
+    deleteLanguage(language,adminToken).then((res) => {
       if (res?.status == 200) {
         Swal.fire({
           title: 'Success!',

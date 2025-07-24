@@ -4,6 +4,8 @@ import { User } from '../../types';
 import { clsx } from 'clsx';
 import { updateProfile } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 interface UserModalProps {
   user: User | null;
@@ -13,6 +15,7 @@ interface UserModalProps {
 }
 
 export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRefresh }) => {
+  const adminToken = useAtomValue(authTokenAtom);
   const [formData, setFormData] = useState({
     id: user?.id || '',
     name: user?.name || '',
@@ -35,7 +38,7 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
     console.log('Form submitted:', formData);
     console.log('Form mode:', mode);
     if(mode==="edit"){
-      updateProfile(formData)
+      updateProfile(formData,adminToken)
       .then((res)=>{
         console.log(res);
         Swal.fire({

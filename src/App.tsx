@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider } from 'jotai';
 import { Login } from './components/Auth/Login';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 import { Sidebar } from './components/Layout/Sidebar';
@@ -12,6 +13,7 @@ import { Settings } from './components/Settings/Settings';
 
 function App() {
   return (
+    <Provider>
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -41,6 +43,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </Provider>
   );
 }
 

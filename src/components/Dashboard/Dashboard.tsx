@@ -4,14 +4,17 @@ import { StatsCard } from './StatsCard';
 import { Chart } from '../Charts/Chart';
 import { dailyActiveUsers, dailyNewUsers } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 export const Dashboard: React.FC = () => {
 
+  const adminToken = useAtomValue(authTokenAtom);
   const [activeUser, setActiveUser] = useState(0);
   const [dailyUser, setDailyUser] = useState(0);
 
   useEffect(() => {
-    dailyActiveUsers().then((res) => {
+    dailyActiveUsers(adminToken).then((res) => {
       if (res?.status == 200) {
         const activeUsers = res?.data["Active Users"];
         setActiveUser(activeUsers)
@@ -34,7 +37,7 @@ export const Dashboard: React.FC = () => {
         buttonsStyling: false, // required to use Tailwind styles
       })
     });
-    dailyNewUsers().then((res) => {
+    dailyNewUsers(adminToken).then((res) => {
       if (res?.status == 200) {
         const newUsers = res?.data["New Users"];
         setDailyUser(newUsers)

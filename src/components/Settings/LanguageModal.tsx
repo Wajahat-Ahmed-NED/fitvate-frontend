@@ -4,6 +4,8 @@ import { Language } from '../../types';
 import { clsx } from 'clsx';
 import { addLanguage, editLanguage } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 interface LanguageModalProps {
     language: Language | null;
@@ -19,6 +21,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
         language: language?.language || '',
         isActive: language?.isActive || true
     });
+    const adminToken = useAtomValue(authTokenAtom);
 
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -27,7 +30,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
         switch (mode) {
             case 'create':
 
-                addLanguage(formData).then((res) => {
+                addLanguage(formData, adminToken).then((res) => {
                     if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
@@ -68,7 +71,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                 break;
             case 'edit':
 
-                editLanguage(formData).then((res) => {
+                editLanguage(formData,adminToken).then((res) => {
                     if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
