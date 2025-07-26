@@ -1,7 +1,7 @@
 import axios from "axios";
 import { User, Language, Article } from "../types";
 
-const api = "http://3.27.12.144:5000";
+const api = "http://3.27.12.144:5000"; //import.meta.env.VITE_api as string;
 // const adminToken = import.meta.env.VITE_adminToken as string;
 const userId = import.meta.env.VITE_userId as string;
 
@@ -15,6 +15,18 @@ interface AdminLoginDTO {
   email: string;
   password: string;
   role: string;
+}
+
+// ================================
+// ISSUES
+// ================================
+
+async function issueDetail(issueId: string, adminToken: string | null) {
+  return await axios.get(`${api}/admin/${issueId}/issues`,{
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  });
 }
 
 // ================================
@@ -321,4 +333,5 @@ export {
   updateArticle,
   addLikedArticle,
   adminLogin,
+  issueDetail
 };

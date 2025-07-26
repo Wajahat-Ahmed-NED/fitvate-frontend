@@ -90,11 +90,12 @@ export interface Exercise {
 export interface ApiIssue {
   id: string;
   requestId: string;
-  endpoint: string;
+  url: string;
   method: string;
-  statusCode: number;
-  errorMessage: string;
-  requestData: any;
-  responseData: any;
+  // statusCode: number;
+  headers: string
+  error: string;
+  requestBody: any;
+  response: any;
   timestamp: string;
 }
