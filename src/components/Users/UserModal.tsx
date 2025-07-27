@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { X, Calendar, Shield } from 'lucide-react';
-import { User } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { X, Calendar, Shield, ShoppingCart, Package } from 'lucide-react';
+import { User, Purchase } from '../../types';
 import { clsx } from 'clsx';
-import { updateProfile } from '../../api/adminPanelAPI';
+import { getPurchases, updateProfile } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { useAtomValue } from 'jotai';
 import { authTokenAtom } from '../../store/auth';
@@ -31,42 +31,67 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
     blocked: user?.blocked || false,
     createdAt: user?.createdAt || ''
   });
+  const [purchaseData, setPurchaseData] = useState<Purchase[] | []>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission
-    console.log('Form submitted:', formData);
-    console.log('Form mode:', mode);
-    if(mode==="edit"){
-      updateProfile(formData,adminToken)
-      .then((res)=>{
-        console.log(res);
-        Swal.fire({
-          title: 'Success!',
-          text: 'Updated Successfully',
-          timer:5000,
-          icon: 'success',
-          width: '300px',
-          padding: '1rem',
-          customClass: {
-            popup: 'p-4 rounded-md shadow-md', // outer box
-            title: 'text-lg font-semibold',     // title
-            htmlContainer: 'text-sm',           // content text
-            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded', // Tailwind button
-            // cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
-          },
-          // showCancelButton: true,
-          confirmButtonText: 'Okay',
-          // cancelButtonText: 'Cancel',
-          buttonsStyling: false, // required to use Tailwind styles
-        });
-      })
+    // console.log('Form submitted:', formData);
+    // console.log('Form mode:', mode);
+    if (mode === "edit") {
+      updateProfile(formData, adminToken)
+        .then((res) => {
+          // console.log(res);
+          Swal.fire({
+            title: 'Success!',
+            text: 'Updated Successfully',
+            timer: 5000,
+            icon: 'success',
+            width: '300px',
+            padding: '1rem',
+            customClass: {
+              popup: 'p-4 rounded-md shadow-md', // outer box
+              title: 'text-lg font-semibold',     // title
+              htmlContainer: 'text-sm',           // content text
+              confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded', // Tailwind button
+              // cancelButton: 'bg-gray-300 text-black px-4 py-2 rounded',
+            },
+            // showCancelButton: true,
+            confirmButtonText: 'Okay',
+            // cancelButtonText: 'Cancel',
+            buttonsStyling: false, // required to use Tailwind styles
+          });
+        })
     }
     onClose();
     onRefresh();
   };
 
   const isReadonly = mode === 'view';
+
+  useEffect(() => {
+    if(mode === 'view') {
+      getPurchases(user?.id || '', adminToken).then((res) => {
+        // console.log("Purchase Data: ", res);
+        setPurchaseData(res?.data?.data || []);
+      }).catch((err) => {
+        console.error("Error fetching purchases: ", err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to fetch purchase data',
+          icon: 'error',
+          confirmButtonText: 'Okay',
+          customClass: {
+            popup: 'p-4 rounded-md shadow-md',
+            title: 'text-lg font-semibold',
+            htmlContainer: 'text-sm',
+            confirmButton: 'bg-red-600 text-white px-4 py-2 rounded',
+          },
+          buttonsStyling: false,
+        });
+      });
+    }
+  }, [user]);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -118,36 +143,36 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
               </select>
             </div>
 
-            {mode!=="edit" && <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input
-                type="email"
-                value={formData?.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                disabled={isReadonly}
-                className={clsx(
-                  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                  isReadonly && 'bg-gray-50 cursor-not-allowed'
-                )}
-                required
-              />
-            </div>
-            
+            {mode !== "edit" && <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={formData?.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  disabled={isReadonly}
+                  className={clsx(
+                    'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                    isReadonly && 'bg-gray-50 cursor-not-allowed'
+                  )}
+                  required
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-              <input
-                type="text"
-                value={formData?.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                disabled={isReadonly}
-                className={clsx(
-                  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                  isReadonly && 'bg-gray-50 cursor-not-allowed'
-                )}
-              />
-            </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                <input
+                  type="text"
+                  value={formData?.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  disabled={isReadonly}
+                  className={clsx(
+                    'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                    isReadonly && 'bg-gray-50 cursor-not-allowed'
+                  )}
+                />
+              </div>
             </>
             }
 
@@ -271,14 +296,14 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
             </div> */}
           </div>
 
-          {user && mode!=="edit" && (
+          {user && mode !== "edit" && (
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Account Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-600">Created:</span>
-                  <span className="font-medium">{user.createdAt? new Date(user.createdAt).toLocaleDateString(): ''}</span>
+                  <span className="font-medium">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   {/* <UserIcon className="w-4 h-4 text-gray-400" />
@@ -300,26 +325,77 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
                   </label>
                 </div>
               </div>
+
+              
+            <div className="bg-gray-50 rounded-lg pt-6">
+              <div className="flex items-center space-x-2 mb-4">
+                <ShoppingCart className="w-5 h-5 text-gray-600" />
+                <h3 className="text-sm font-medium text-gray-700">Purchase History</h3>
+                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  {purchaseData?.length} purchase{purchaseData?.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              <div className="space-y-3 max-h-64 overflow-y-scroll drop-shadow-md">
+                {purchaseData?.map((purchase) => (
+                  <div key={purchase.id} className="bg-white rounded-lg p-3 border border-gray-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Package className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-gray-900">
+                            Product ID: {purchase.productId}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-2 text-xs text-gray-600">
+                          <div className="flex justify-between">
+                            <span>Order ID:</span>
+                            <code className="bg-gray-100 px-1 rounded text-xs">
+                              {purchase.orderId}
+                            </code>
+                          </div>
+                          {/* <div className="flex justify-between">
+                            <span>Purchase Date:</span>
+                            <span className="font-medium">
+                              {new Date(purchase.createdAt).toLocaleDateString()}
+                            </span>
+                          </div> */}
+                          <div className="flex justify-between">
+                            <span>Token:</span>
+                            <code className="bg-gray-100 px-1 rounded text-xs max-w-32 truncate">
+                              {purchase.purchaseToken}
+                            </code>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             </div>
           )}
 
-          {!isReadonly && (
+          {/* {!isReadonly && ( */}
             <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
               <button
                 type="button"
                 onClick={onClose}
                 className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                Cancel
+                {!isReadonly? 'Cancel': 'Close'}
               </button>
+              {!isReadonly && (
               <button
                 type="submit"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 {mode === 'create' ? 'Create User' : 'Save Changes'}
               </button>
+              )}
             </div>
-          )}
+          {/* )} */}
         </form>
       </div>
     </div>

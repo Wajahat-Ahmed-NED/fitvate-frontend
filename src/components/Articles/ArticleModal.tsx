@@ -4,6 +4,8 @@ import { Article, Language } from '../../types';
 import { clsx } from 'clsx';
 import { createArticle, updateArticle } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
+import { useAtomValue } from 'jotai';
+import { authTokenAtom } from '../../store/auth';
 
 interface ArticleModalProps {
   article: Article | null;
@@ -14,6 +16,7 @@ interface ArticleModalProps {
 }
 
 export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose, onRefresh }) => {
+  const adminToken = useAtomValue(authTokenAtom);
   const [activeLanguage, setActiveLanguage] = useState('en');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     //article?.languages || ['en']
@@ -70,12 +73,12 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Article submitted:', formData);
+    // console.log('Article submitted:', formData);
 
     switch (mode) {
             case 'create':
 
-                createArticle(formData).then((res) => {
+                createArticle(formData,adminToken).then((res) => {
                     if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
@@ -116,7 +119,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 break;
             case 'edit':
 
-                updateArticle(formData).then((res) => {
+                updateArticle(formData, adminToken).then((res) => {
                     if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',

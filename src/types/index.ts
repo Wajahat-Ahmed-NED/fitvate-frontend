@@ -20,13 +20,13 @@ export interface User {
 
 export interface Purchase {
   id: string;
+  orderId: string;
+  productId: string;
+  purchaseToken: string;
   userId: string;
-  productName: string;
-  amount: number;
-  currency: string;
-  status: 'completed' | 'pending' | 'failed';
   createdAt: string;
 }
+
 
 export interface Article {
   id: string;
