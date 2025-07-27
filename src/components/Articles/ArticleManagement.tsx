@@ -114,7 +114,7 @@ export const ArticleManagement: React.FC = () => {
     });
   };
 
-  const filteredArticles = articles.filter(article => {
+  const filteredArticles = articles?.filter(article => {
     const matchesSearch = Object.values(article?.title).some(title =>
       title.toLowerCase().includes(searchTerm.toLowerCase())
     );

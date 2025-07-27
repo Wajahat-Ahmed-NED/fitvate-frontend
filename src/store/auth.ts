@@ -2,8 +2,10 @@ import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 
+const storedToken = localStorage.getItem('authToken');
+
 // Atoms with localStorage persistence
-export const authTokenAtom = atomWithStorage<string | null>('authToken', null);
+export const authTokenAtom = atomWithStorage<string | null>('authToken', storedToken);
 
 // Derived atom for authentication status
 export const isAuthenticatedAtom = atom((get) => {

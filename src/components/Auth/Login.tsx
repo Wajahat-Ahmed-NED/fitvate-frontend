@@ -25,13 +25,16 @@ export const Login: React.FC = () => {
 
     try {
       adminLogin(formData).then((res)=>{
-        // console.log(res)
-        // localStorage.setItem('authToken', res?.data?.data?.token);
-        login({ token: res?.data?.data?.token });
-        // Redirect to dashboard
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1000);
+        console.log("res > ",res)
+        const token = res?.data?.data?.token;
+        if(token){
+          login({ token: token});
+          localStorage.setItem('authToken', token);
+          // Redirect to dashboard
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 1000);
+        }
       })
       .catch((err)=>{
         setError(err?.data?.message || 'Login failed. Please try again.')

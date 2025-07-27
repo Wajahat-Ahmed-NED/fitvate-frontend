@@ -26,7 +26,7 @@ export const UserManagement: React.FC = () => {
 
   useEffect(() => {
     fetchUsers(1);
-  }, [pagination.page]);
+  }, [pagination?.page]);
 
   const handleRefresh = () => {
     fetchUsers(1);
@@ -35,7 +35,7 @@ export const UserManagement: React.FC = () => {
   const debouncedFilter = useMemo(
   () =>
     debounce((text: string) => {
-        const filtered = allUsers.filter((user) =>
+        const filtered = allUsers?.filter((user) =>
           user.name.toLowerCase().includes(text.toLowerCase())
         );
         setUsers(filtered);
@@ -54,7 +54,7 @@ export const UserManagement: React.FC = () => {
     try {
       setLoading(true);
       const response = await listUsers(page,adminToken);
-      console.log(response)
+      // console.log(response)
       setAllUsers(response?.data?.data);
       setUsers(response?.data?.data); 
       setPagination(response?.data?.pagination);
@@ -139,7 +139,7 @@ export const UserManagement: React.FC = () => {
           buttonsStyling: false, // required to use Tailwind styles
         })
       }
-      fetchUsers(pagination.page);
+      fetchUsers(pagination?.page);
     }).catch((err) => {
       Swal.fire({
         title: 'Error!',
@@ -361,7 +361,7 @@ export const UserManagement: React.FC = () => {
                             <Trash2 className="w-4 h-4" />
                           </button>
                           <button 
-                            className="text-orange-600 hover:text-orange-900 p-1 rounded transition-colors"
+                            className={user.blocked ? "text-green-600 hover:text-green-900 p-1 rounded transition-colors":"text-orange-600 hover:text-orange-900 p-1 rounded transition-colors"}
                             title={user.blocked ? "Unblock User" : "Block User"}
                             onClick={() => handleBlockUser(user)}
                           >
@@ -375,28 +375,34 @@ export const UserManagement: React.FC = () => {
                 }
               </table>
             </div>
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center px-4 mt-4 gap-4">
+              <span className="text-sm">
+                Users per page: <span className="font-semibold">{pagination?.limit}</span>
+              </span>
+              <span className="text-sm">
+                Total Users: <span className="font-semibold">{pagination?.total}</span>
+              </span>
+              <div className="flex justify-end items-center space-x-2">
               <button
-                disabled={pagination.page === 1}
-                onClick={() => fetchUsers(pagination.page - 1)}
+                disabled={pagination?.page === 1}
+                onClick={() => fetchUsers(pagination?.page - 1)}
                 className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                 title='Go to previous page'
               >
                 Previous
               </button>
-
               <span className="text-sm">
-                Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit)}
+                {pagination?.page} / {Math.max(1, Math.ceil(pagination?.total / pagination?.limit))}
               </span>
-
               <button
-                disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
-                onClick={() => fetchUsers(pagination.page + 1)}
+                disabled={pagination?.page >= Math.ceil(pagination?.total / pagination?.limit)}
+                onClick={() => fetchUsers(pagination?.page + 1)}
                 className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
                 title='Go to next page'
               >
                 Next
               </button>
+              </div>
             </div>
 
             </>
