@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Calendar, Shield, ShoppingCart, Package } from 'lucide-react';
+import { X, Calendar, Shield, ShoppingCart, Package,Crown } from 'lucide-react';
 import { User, Purchase } from '../../types';
 import { clsx } from 'clsx';
 import { getPurchases, updateProfile } from '../../api/adminPanelAPI';
@@ -29,7 +29,8 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
     height: user?.height || '',
     weight: user?.weight || '',
     blocked: user?.blocked || false,
-    createdAt: user?.createdAt || ''
+    createdAt: user?.createdAt || '',
+    premiumMembership: user?.premiumMembership || false,
   });
   const [purchaseData, setPurchaseData] = useState<Purchase[] | []>([]);
 
@@ -297,6 +298,8 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
           </div>
 
           {user && mode !== "edit" && (
+            <>
+            
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Account Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -304,6 +307,20 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
                   <Calendar className="w-4 h-4 text-gray-400" />
                   <span className="text-gray-600">Created:</span>
                   <span className="font-medium">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : ''}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="isPremium"
+                    checked={formData.premiumMembership}
+                    onChange={(e) => setFormData({ ...formData, premiumMembership: e.target.checked })}
+                    disabled={isReadonly}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isPremium" className="text-sm font-medium text-gray-700 flex items-center space-x-2">
+                    <Crown className="w-4 h-4 text-yellow-500" />
+                    <span>Premium Member</span>
+                  </label>
                 </div>
                 <div className="flex items-center space-x-2">
                   {/* <UserIcon className="w-4 h-4 text-gray-400" />
@@ -325,9 +342,11 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
                   </label>
                 </div>
               </div>
+            </div>
 
+            
               
-            <div className="bg-gray-50 rounded-lg pt-6">
+            <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-4">
                 <ShoppingCart className="w-5 h-5 text-gray-600" />
                 <h3 className="text-sm font-medium text-gray-700">Purchase History</h3>
@@ -374,7 +393,8 @@ export const UserModal: React.FC<UserModalProps> = ({ user, mode, onClose, onRef
                 ))}
               </div>
             </div>
-            </div>
+
+            </>
           )}
 
           {/* {!isReadonly && ( */}

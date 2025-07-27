@@ -12,6 +12,11 @@ interface ToggleBlockParams {
   userId: string;
 }
 
+interface ToggleMembershipParams {
+  isPremium: boolean;
+  userId: string;
+}
+
 interface AdminLoginDTO {
   email: string;
   password: string;
@@ -120,6 +125,25 @@ async function toggleBlock(
     return await axios.put(
       `${api}/admin/user/${userId}/block`,
       { blocked: blockStatus },
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      }
+    );
+  } catch (error: any) {
+    errorAlert(error?.response?.data?.message || error?.message);
+  }
+}
+
+async function toggleMembership(
+  { isPremium, userId }: ToggleMembershipParams,
+  adminToken: string | null
+) {
+  try {
+    return await axios.put(
+      `${api}/admin/user/${userId}/membership`,
+      { isPremium: isPremium },
       {
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -422,6 +446,7 @@ export {
   updateProfile,
   deleteProfile,
   toggleBlock,
+  toggleMembership,
   getPurchases,
   dailyActiveUsers,
   dailyNewUsers,
@@ -440,5 +465,5 @@ export {
   updateArticle,
   addLikedArticle,
   adminLogin,
-  issueDetail
+  issueDetail,
 };

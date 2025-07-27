@@ -16,6 +16,7 @@ export interface User {
   googleId?: string | null;
   facebookId?: string | null;
   createdAt?: string | null;
+  premiumMembership?: boolean;
 }
 
 export interface Purchase {

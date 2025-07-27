@@ -3,7 +3,7 @@ import { Search, Filter, Edit, Trash2, Ban, CheckCircle, Eye } from 'lucide-reac
 import { User } from '../../types';
 import { UserModal } from './UserModal';
 import { clsx } from 'clsx';
-import { deleteProfile, listUsers, toggleBlock } from '../../api/adminPanelAPI';
+import { deleteProfile, listUsers, toggleBlock, toggleMembership } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { debounce } from 'lodash';
 import { useAtomValue } from 'jotai';
@@ -36,7 +36,7 @@ export const UserManagement: React.FC = () => {
   () =>
     debounce((text: string) => {
         const filtered = allUsers?.filter((user) =>
-          user.name.toLowerCase().includes(text.toLowerCase())
+          user?.name.toLowerCase().includes(text.toLowerCase())
         );
         setUsers(filtered);
       }, 300),
@@ -162,8 +162,52 @@ export const UserManagement: React.FC = () => {
   
   const handleBlockUser = (user: User) => {
     toggleBlock({
-      blockStatus: !user.blocked,
-      userId: user.id,
+      blockStatus: !user?.blocked,
+      userId: user?.id,
+    },adminToken).then((res)=>{
+      if(res?.status==200){
+        Swal.fire({
+        title: 'Success!',
+        text: `${res?.data?.message}`,
+        timer: 5000,
+        icon: 'success',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md', 
+          title: 'text-lg font-semibold',   
+          htmlContainer: 'text-sm',       
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded', 
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+        });
+        handleRefresh();
+      }
+    }).catch((err)=>{
+        Swal.fire({
+        title: 'Error!',
+        text: `${err?.data?.message}`,
+        timer: 5000,
+        icon: 'error',
+        width: '300px',
+        padding: '1rem',
+        customClass: {
+          popup: 'p-4 rounded-md shadow-md', 
+          title: 'text-lg font-semibold',   
+          htmlContainer: 'text-sm',       
+          confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded', 
+        },
+        confirmButtonText: 'Okay',
+        buttonsStyling: false, // required to use Tailwind styles
+      })
+    })
+  };
+
+  const handleMemberShipUser = (user: User) => {
+    toggleMembership({
+      isPremium: !user?.premiumMembership,
+      userId: user?.id,
     },adminToken).then((res)=>{
       if(res?.status==200){
         Swal.fire({
@@ -289,6 +333,9 @@ export const UserManagement: React.FC = () => {
                       Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Premium
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -302,44 +349,63 @@ export const UserManagement: React.FC = () => {
                 {users && 
                 <tbody className="bg-white divide-y divide-gray-200">
                   {users?.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
+                    <tr key={user?.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                             <span className="text-white font-medium">
-                              {user.name[0]}
+                              {user?.name[0]}
                             </span>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {user.name}
+                              {user?.name}
                             </div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
+                            <div className="text-sm text-gray-500">{user?.email}</div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={clsx(
                           'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                          user.blocked
+                          user?.blocked
                             ? 'bg-red-100 text-red-800'
                             : 'bg-green-100 text-green-800'
                         )}>
-                          {user.blocked ? 'Blocked' : 'Active'}
+                          {user?.blocked ? 'Blocked' : 'Active'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleMemberShipUser(user)}
+                          className={clsx(
+                            "w-12 h-6 flex items-center rounded-full transition-colors duration-300 focus:outline-none",
+                            user?.premiumMembership ? "bg-yellow-400" : "bg-gray-300"
+                          )}
+                          title={user?.premiumMembership ? "Revoke Premium" : "Grant Premium"}
+                          aria-pressed={user?.premiumMembership}
+                          type="button"
+                        >
+                          <span
+                            className={clsx(
+                              "inline-block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-300",
+                              user?.premiumMembership ? "translate-x-6" : "translate-x-1"
+                            )}
+                          />
+                        </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={clsx(
                           'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                          user.role
+                          user?.role
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-gray-100 text-gray-800'
                         )}>
-                          {user.role}
+                          {user?.role}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {user.gender}
+                        {user?.gender}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
@@ -361,11 +427,11 @@ export const UserManagement: React.FC = () => {
                             <Trash2 className="w-4 h-4" />
                           </button>
                           <button 
-                            className={user.blocked ? "text-green-600 hover:text-green-900 p-1 rounded transition-colors":"text-orange-600 hover:text-orange-900 p-1 rounded transition-colors"}
-                            title={user.blocked ? "Unblock User" : "Block User"}
+                            className={user?.blocked ? "text-green-600 hover:text-green-900 p-1 rounded transition-colors":"text-orange-600 hover:text-orange-900 p-1 rounded transition-colors"}
+                            title={user?.blocked ? "Unblock User" : "Block User"}
                             onClick={() => handleBlockUser(user)}
                           >
-                            {user.blocked ? <CheckCircle className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                            {user?.blocked ? <CheckCircle className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
                           </button>
                         </div>
                       </td>
