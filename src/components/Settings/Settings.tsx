@@ -158,29 +158,29 @@ export const Settings: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {languages?.map((language) => (
-                <tr key={language.id} className="hover:bg-gray-50">
+                <tr key={language?.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {language.id}
+                    {language?.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <code className="text-sm text-gray-900 bg-gray-100 px-2 py-1 rounded">
-                      {language.locale}
+                      {language?.locale}
                     </code>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
                       <Languages className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium text-gray-900">{language.language}</span>
+                      <span className="text-sm font-medium text-gray-900">{language?.language}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={clsx(
                       'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                      language.isActive
+                      language?.status
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
                     )}>
-                      {language.isActive ? 'Active' : 'Inactive'}
+                      {language?.status ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

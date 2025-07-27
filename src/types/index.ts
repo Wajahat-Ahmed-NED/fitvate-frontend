@@ -48,7 +48,7 @@ export interface Language {
   id: number | null;
   locale: string;
   language: string;
-  isActive: boolean;
+  status: boolean;
 }
 
 export interface DashboardStats {

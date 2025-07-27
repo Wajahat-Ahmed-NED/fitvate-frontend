@@ -3,7 +3,7 @@ import { Plus, Search, Edit, Trash2, Globe, Languages, Eye } from 'lucide-react'
 import { Article, Language } from '../../types';
 import { ArticleModal } from './ArticleModal';
 import { clsx } from 'clsx';
-import { deleteArticle, getAllLanguages, getArticles } from '../../api/adminPanelAPI';
+import { deleteArticle, getAllLanguages, getArticles, getArticleByLanguage } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { useAtomValue } from 'jotai';
 import { authTokenAtom } from '../../store/auth';
@@ -21,6 +21,11 @@ export const ArticleManagement: React.FC = () => {
   // const [languageToBeModified, setLanguageToBeModified] = useState<Language | null>(null);
   const [languages, setLanguages] = useState<Language[] | []>([]);  
   const [articles, setArticles] = useState<Article[]>([]);
+    const [pagination, setPagination] = useState({
+      page: 1,
+      limit: 10,
+      total: 0,
+    });
 
   useEffect(()=>{
     getAllLanguages(adminToken).then((res)=>{
@@ -52,6 +57,13 @@ export const ArticleManagement: React.FC = () => {
     getArticles(adminToken).then((res)=>{
       if (res?.status == 200) {
               setArticles(res?.data?.data?.articles)
+              setPagination( prev => ({
+                ...prev, 
+                total: res?.data?.data?.totalPages || 0,
+                limit: res?.data?.data?.pageSize || 10, 
+                page: res?.data?.data?.currentPageNumber || 1
+              }
+              ));
             }
           }).catch((err) => {
             Swal.fire({
@@ -171,6 +183,37 @@ export const ArticleManagement: React.FC = () => {
     }
   };
 
+  const filteredArticlesByLanguage = (langCode: string) => {
+    setSelectedLanguage(langCode);
+    if (langCode === 'all') {
+      setSearchTerm('');
+      fetchArticles();
+    } else {
+      getArticleByLanguage(adminToken, langCode).then((res) => {
+        if (res?.status === 200) {
+          setArticles(res?.data?.data?.articles);
+        }
+      }).catch((err) => {
+        Swal.fire({
+          title: 'Error!',
+          text: `${err?.data?.message || 'Failed to fetch articles by language'}`,
+          timer: 5000,
+          icon: 'error',
+          width: '300px',
+          padding: '1rem',
+          customClass: {
+            popup: 'p-4 rounded-md shadow-md',
+            title: 'text-lg font-semibold',
+            htmlContainer: 'text-sm',
+            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+          },
+          confirmButtonText: 'Okay',
+          buttonsStyling: false, // required to use Tailwind styles
+        })
+      });
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -208,7 +251,7 @@ export const ArticleManagement: React.FC = () => {
             </div>
             <select
               value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
+              onChange={(e) => filteredArticlesByLanguage(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="all">All Languages</option>
@@ -310,6 +353,35 @@ export const ArticleManagement: React.FC = () => {
             </tbody>
           </table>
         </div>
+        <div className="flex justify-between items-center px-4 mt-4 gap-4">
+              <span className="text-sm">
+                Page Size: <span className="font-semibold">{pagination?.limit}</span>
+              </span>
+              {/* <span className="text-sm">
+                Total Articles: <span className="font-semibold">{pagination?.total}</span>
+              </span> */}
+              <div className="flex justify-end items-center space-x-2">
+              <button
+                disabled={pagination?.page === 1}
+                // onClick={() => fetchUsers(pagination?.page - 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                title='Go to previous page'
+              >
+                Previous
+              </button>
+              <span className="text-sm">
+                {pagination?.page} / {Math.max(1, Math.ceil(pagination?.total / pagination?.limit))}
+              </span>
+              <button
+                disabled={pagination?.page >= Math.ceil(pagination?.total / pagination?.limit)}
+                // onClick={() => fetchUsers(pagination?.page + 1)}
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+                title='Go to next page'
+              >
+                Next
+              </button>
+              </div>
+            </div>
       </div>
 
       {isModalOpen && (

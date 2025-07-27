@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Image, Languages, Wand2 } from 'lucide-react';
 import { Article, Language } from '../../types';
 import { clsx } from 'clsx';
@@ -17,10 +17,10 @@ interface ArticleModalProps {
 
 export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose, onRefresh }) => {
   const adminToken = useAtomValue(authTokenAtom);
-  const [activeLanguage, setActiveLanguage] = useState('en');
+  const [activeLanguage, setActiveLanguage] = useState(article?.locale || 'en');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     //article?.languages || ['en']
-    ['en']
+    [article?.locale || 'en']
   );
   const [formData, setFormData] = useState<Article>({
   id: article?.id || '',
@@ -38,13 +38,26 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
   userId: article?.userId || '',
 });
 
+  useEffect(() => {
+    
+  },[])
 
 
   const handleLanguageToggle = (langCode: string) => {
     if (selectedLanguages?.includes(langCode)) {
       setSelectedLanguages(selectedLanguages?.filter(code => code !== langCode));
+      setFormData({
+        ...formData,
+        locale: 'en'
+      })
+      setActiveLanguage('en');
     } else {
       setSelectedLanguages([...selectedLanguages, langCode]);
+      setFormData({
+        ...formData,
+        locale: langCode
+      })
+      setActiveLanguage(langCode);
     }
   };
 
@@ -359,7 +372,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                   Languages
                 </label>
                 <div className="space-y-2">
-                  {languages?.map((lang) => (
+                  {languages?.filter((l)=>l.status===true).map((lang) => (
                     <div key={lang.locale} className="flex items-center space-x-2">
                       <input
                         type="checkbox"

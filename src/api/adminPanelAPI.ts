@@ -4,7 +4,7 @@ import errorAlert from "../utils/errorSwal";
 
 const api = "http://3.27.12.144:5000"; //import.meta.env.VITE_api as string;
 // const adminToken = import.meta.env.VITE_adminToken as string;
-const userId = import.meta.env.VITE_userId as string;
+const userId = "d9124898-5144-46cf-b07b-6444c383bdc5"; //import.meta.env.VITE_userId as string;
 
 // Define interfaces
 interface ToggleBlockParams {
@@ -213,6 +213,7 @@ async function editLanguage(language: Language, adminToken: string | null) {
       {
         locale: language.locale,
         language: language.language,
+        status: language.status?'active':'inactive',
       },
       {
         headers: {
@@ -265,7 +266,19 @@ async function changeArticleStatus(
 
 async function getArticles(adminToken: string | null) {
   try {
-    return await axios.get(`${api}/users/${userId}/posts?locale=en&pageSize=8`, {
+    return await axios.get(`${api}/users/${userId}/posts`, {
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+      },
+    });
+  } catch (error: any) {
+    errorAlert(error?.response?.data?.message || error?.message);
+  }
+}
+
+async function getArticleByLanguage(adminToken: string | null, langCode: string) {
+  try {
+    return await axios.get(`${api}/users/${userId}/posts?locale=${langCode}&pageSize=8`, {
       headers: {
         Authorization: `Bearer ${adminToken}`,
       },
@@ -418,6 +431,7 @@ export {
   deleteLanguage,
   changeArticleStatus,
   getArticles,
+  getArticleByLanguage,
   getLikedArticle,
   getSingleArticle,
   deleteArticle,

@@ -19,7 +19,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
         id: language?.id || 0,
         locale: language?.locale || '',
         language: language?.language || '',
-        isActive: language?.isActive || true
+        status: language?.status || false
     });
     const adminToken = useAtomValue(authTokenAtom);
 
@@ -71,7 +71,7 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                 break;
             case 'edit':
 
-                editLanguage(formData,adminToken).then((res) => {
+                editLanguage(formData, adminToken).then((res) => {
                     if (res?.status == 200) {
                         Swal.fire({
                             title: 'Success!',
@@ -176,6 +176,28 @@ export const LanguageModal: React.FC<LanguageModalProps> = ({ language, mode, on
                                             )}
                                             required
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Status
+                                        </label>
+                                        <select
+                                            value={formData.status ? 'active' : 'inactive'}
+                                            onChange={e =>
+                                                setFormData({
+                                                    ...formData,
+                                                    status: e.target.value === 'active'
+                                                })
+                                            }
+                                            disabled={isReadonly}
+                                            className={clsx(
+                                                'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                                                isReadonly && 'bg-gray-50 cursor-not-allowed'
+                                            )}
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
