@@ -25,11 +25,11 @@ export const Login: React.FC = () => {
 
     try {
       adminLogin(formData).then((res)=>{
-        console.log("res > ",res)
+        // console.log("res > ",res)
         const token = res?.data?.data?.token;
         if(token){
-          login({ token: token});
           localStorage.setItem('authToken', token);
+          login({ token: token});
           // Redirect to dashboard
           setTimeout(() => {
             navigate('/dashboard');

@@ -285,10 +285,10 @@ export const UserManagement: React.FC = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+            {/* <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
               <Filter className="w-4 h-4" />
               <span>Filter</span>
-            </button>
+            </button> */}
           </div>
         </div>
           {loading ? 

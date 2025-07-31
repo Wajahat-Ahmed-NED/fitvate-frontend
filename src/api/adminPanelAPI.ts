@@ -340,6 +340,7 @@ async function createArticle(
         locale: article.locale,
         category: article.category,
         source: article.source,
+        status: article.status,
       },
       {
         headers: {
@@ -368,6 +369,7 @@ async function updateArticle(
         locale: article.locale,
         category: article.category,
         source: article.source,
+        status: article.status,
       },
       {
         headers: {
