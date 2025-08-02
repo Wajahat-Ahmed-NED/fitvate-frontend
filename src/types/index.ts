@@ -44,6 +44,11 @@ export interface Article {
   updatedAt: string;
   userId: string;
 }
+// export interface TranslationDTO {
+//   title: string;
+//   body: string;
+//   languagetotranslateto: string;
+// }
 
 export interface Language {
   id: number | null;

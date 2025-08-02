@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { X, Image, Languages, Wand2 } from 'lucide-react';
 import { Article, Language } from '../../types';
 import { clsx } from 'clsx';
-import { createArticle, updateArticle } from '../../api/adminPanelAPI';
+import { AutoTranslateArticle, createArticle, updateArticle } from '../../api/adminPanelAPI';
 import Swal from 'sweetalert2';
 import { useAtomValue } from 'jotai';
 import { authTokenAtom } from '../../store/auth';
-
+// import { translateArticle } from '../../services/translationService';
+// import { TranslationDTO } from '../../types';
 interface ArticleModalProps {
   article: Article | null;
   mode: 'view' | 'edit' | 'create';
@@ -18,29 +19,26 @@ interface ArticleModalProps {
 export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose, onRefresh }) => {
   const adminToken = useAtomValue(authTokenAtom);
   const [activeLanguage, setActiveLanguage] = useState(article?.locale || 'en');
+  // const [translatedArticle, setTranslatedArticle] = useState<TranslationDTO | null>(null);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     //article?.languages || ['en']
     [article?.locale || 'en']
   );
   const [formData, setFormData] = useState<Article>({
-  id: article?.id || '',
-  title: article?.title || '',
-  body: article?.body || '',
-  imageUrl: article?.imageUrl || '',
-  status: article?.status || 'Draft',
-  topic: article?.topic || '',
-  type: article?.type || '',
-  locale: article?.locale || 'en',
-  createdAt: article?.createdAt || new Date().toISOString(),
-  updatedAt: article?.updatedAt || new Date().toISOString(),
-  source: article?.source || '',
-  category: article?.category || '',
-  userId: article?.userId || '',
-});
-
-  useEffect(() => {
-    
-  },[])
+    id: article?.id || '',
+    title: article?.title || '',
+    body: article?.body || '',
+    imageUrl: article?.imageUrl || '',
+    status: article?.status || 'Draft',
+    topic: article?.topic || '',
+    type: article?.type || '',
+    locale: article?.locale || 'en',
+    createdAt: article?.createdAt || new Date().toISOString(),
+    updatedAt: article?.updatedAt || new Date().toISOString(),
+    source: article?.source || '',
+    category: article?.category || '',
+    userId: article?.userId || '',
+  });
 
 
   const handleLanguageToggle = (langCode: string) => {
@@ -61,120 +59,176 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
     }
   };
 
-  const handleAutoTranslate = () => {
-    // Simulate auto-translation
-    // const englishTitle = formData?.title //formData?.title.en;
-    // const englishDescription = formData?.body;
-    
-    // const newTitle = { ...formData?.title };
-    // const newDescription = { ...formData?.body };
-    
-    // selectedLanguages?.forEach(langCode => {
-    //   if (langCode !== 'en') {
-    //     // Mock translation - in real app, this would call a translation API
-    //     newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
-    //     newDescription[langCode] = `[${langCode.toUpperCase()}] ${englishDescription}`;
-    //   }
-    // });
-    
-    // setFormData({
-    //   ...formData,
-    //   title: newTitle,
-    //   description: newDescription,
-    // });
+  const handleAutoTranslate = async () => {
+    const matchLanguageName = languages.find(lang => lang.locale === activeLanguage);
+    const articleBody = JSON.stringify({ title: formData?.title || '', body: formData?.body || '' })
+    AutoTranslateArticle(articleBody, matchLanguageName?.language || 'en', adminToken).then((res) => {
+      console.log("res data ", res?.data);
+      const translatedResponse = JSON.parse(res?.data?.data?.translation)
+
+      if (!translatedResponse) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to translate article',
+          icon: 'error',
+          confirmButtonText: 'Okay',
+        });
+        return;
+      } else {
+        console.log('Translated Article:', translatedResponse);
+
+        setFormData({
+          ...formData,
+          title: translatedResponse.title,
+          body: translatedResponse.body,
+        });
+
+      }
+    })
+
   };
+
+  //  const handleAutoTranslate = async () => {                                                 //TO USE auto-translate service
+  //   const matchLanguageName = languages.find(lang => lang.locale === activeLanguage);
+  //   const article = {
+  //     title: formData?.title || '',
+  //     body: formData?.body || '',
+  //     languagetotranslateto: matchLanguageName?.language  || activeLanguage
+  //   };
+
+  //   const translated = await translateArticle(article);
+  //   // console.log( 'Translated Article:', translated);
+  //   if (!translated) {
+  //     Swal.fire({
+  //       title: 'Error!',
+  //       text: 'Failed to translate article',
+  //       icon: 'error',
+  //       confirmButtonText: 'Okay',
+  //     });
+  //     return;
+  //   }else{
+  //     setFormData({
+  //       ...formData,
+  //       title: translated.title,
+  //       body: translated.body, 
+  //   });
+  //   }
+  // };
+
+  //const handleAutoTranslate = () => {                                         //TO SUPPORT MULTIPLE LANGUAGES
+  // Simulate auto-translation
+  // const englishTitle = formData?.title //formData?.title.en;
+  // const englishDescription = formData?.body;
+
+  // const newTitle = { ...formData?.title };
+  // const newDescription = { ...formData?.body };
+
+  // selectedLanguages?.forEach(langCode => {
+  //   if (langCode !== 'en') {
+  //     // Mock translation - in real app, this would call a translation API
+  //     newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
+  //     newDescription[langCode] = `[${langCode.toUpperCase()}] ${englishDescription}`;
+  //   }
+  // });
+
+  // setFormData({
+  //   ...formData,
+  //   title: newTitle,
+  //   description: newDescription,
+  // });
+  //};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // console.log('Article submitted:', formData);
 
     switch (mode) {
-            case 'create':
+      case 'create':
 
-                createArticle(formData,adminToken).then((res) => {
-                    if (res?.status == 200) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: `${res?.data?.message || 'Article Created Successfully'}`,
-                            timer: 5000,
-                            icon: 'success',
-                            width: '300px',
-                            padding: '1rem',
-                            customClass: {
-                                popup: 'p-4 rounded-md shadow-md',
-                                title: 'text-lg font-semibold',
-                                htmlContainer: 'text-sm',
-                                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
-                            },
-                            confirmButtonText: 'Okay',
-                            buttonsStyling: false, // required to use Tailwind styles
-                        })
-                    }
-                    onRefresh();
-                }).catch((err) => {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: `${err?.data?.message || 'Failed to create Article'}`,
-                        timer: 5000,
-                        icon: 'error',
-                        width: '300px',
-                        padding: '1rem',
-                        customClass: {
-                            popup: 'p-4 rounded-md shadow-md',
-                            title: 'text-lg font-semibold',
-                            htmlContainer: 'text-sm',
-                            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
-                        },
-                        confirmButtonText: 'Okay',
-                        buttonsStyling: false, // required to use Tailwind styles
-                    })
-                });
-                break;
-            case 'edit':
+        createArticle(formData, adminToken).then((res) => {
+          if (res?.status == 200) {
+            Swal.fire({
+              title: 'Success!',
+              text: `${res?.data?.message || 'Article Created Successfully'}`,
+              timer: 5000,
+              icon: 'success',
+              width: '300px',
+              padding: '1rem',
+              customClass: {
+                popup: 'p-4 rounded-md shadow-md',
+                title: 'text-lg font-semibold',
+                htmlContainer: 'text-sm',
+                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+              },
+              confirmButtonText: 'Okay',
+              buttonsStyling: false, // required to use Tailwind styles
+            })
+          }
+          onRefresh();
+        }).catch((err) => {
+          Swal.fire({
+            title: 'Error!',
+            text: `${err?.data?.message || 'Failed to create Article'}`,
+            timer: 5000,
+            icon: 'error',
+            width: '300px',
+            padding: '1rem',
+            customClass: {
+              popup: 'p-4 rounded-md shadow-md',
+              title: 'text-lg font-semibold',
+              htmlContainer: 'text-sm',
+              confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+            },
+            confirmButtonText: 'Okay',
+            buttonsStyling: false, // required to use Tailwind styles
+          })
+        });
+        break;
+      case 'edit':
 
-                updateArticle(formData, adminToken).then((res) => {
-                    if (res?.status == 200) {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: `${res?.data?.message || 'Article Updated Successfully'}`,
-                            timer: 5000,
-                            icon: 'success',
-                            width: '300px',
-                            padding: '1rem',
-                            customClass: {
-                                popup: 'p-4 rounded-md shadow-md',
-                                title: 'text-lg font-semibold',
-                                htmlContainer: 'text-sm',
-                                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
-                            },
-                            confirmButtonText: 'Okay',
-                            buttonsStyling: false, // required to use Tailwind styles
-                        })
-                    }
-                    onRefresh();
-                }).catch((err) => {
-                    Swal.fire({
-                        title: 'Error!',
-                        text: `${err?.data?.message || 'Failed to update Article'}`,
-                        timer: 5000,
-                        icon: 'error',
-                        width: '300px',
-                        padding: '1rem',
-                        customClass: {
-                            popup: 'p-4 rounded-md shadow-md',
-                            title: 'text-lg font-semibold',
-                            htmlContainer: 'text-sm',
-                            confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
-                        },
-                        confirmButtonText: 'Okay',
-                        buttonsStyling: false, // required to use Tailwind styles
-                    })
-                });
-                break;
+        updateArticle(formData, adminToken).then((res) => {
+          if (res?.status == 200) {
+            Swal.fire({
+              title: 'Success!',
+              text: `${res?.data?.message || 'Article Updated Successfully'}`,
+              timer: 5000,
+              icon: 'success',
+              width: '300px',
+              padding: '1rem',
+              customClass: {
+                popup: 'p-4 rounded-md shadow-md',
+                title: 'text-lg font-semibold',
+                htmlContainer: 'text-sm',
+                confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+              },
+              confirmButtonText: 'Okay',
+              buttonsStyling: false, // required to use Tailwind styles
+            })
+          }
+          onRefresh();
+        }).catch((err) => {
+          Swal.fire({
+            title: 'Error!',
+            text: `${err?.data?.message || 'Failed to update Article'}`,
+            timer: 5000,
+            icon: 'error',
+            width: '300px',
+            padding: '1rem',
+            customClass: {
+              popup: 'p-4 rounded-md shadow-md',
+              title: 'text-lg font-semibold',
+              htmlContainer: 'text-sm',
+              confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
+            },
+            confirmButtonText: 'Okay',
+            buttonsStyling: false, // required to use Tailwind styles
+          })
+        });
+        break;
 
-            default:
-                break;
-        }
+      default:
+        break;
+    }
     onClose();
   };
 
@@ -293,7 +347,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       onChange={(e) => setFormData({
                         ...formData,
                         title: e.target.value //{ ...formData?.title, [activeLanguage]: e.target.value }
-                      })}       
+                      })}
                       disabled={isReadonly}
                       className={clsx(
                         'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -313,7 +367,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       onChange={(e) => setFormData({
                         ...formData,
                         type: e.target.value //{ ...formData?.type, [activeLanguage]: e.target.value }
-                      })}       
+                      })}
                       disabled={isReadonly}
                       className={clsx(
                         'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -333,7 +387,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       onChange={(e) => setFormData({
                         ...formData,
                         topic: e.target.value //{ ...formData?.topic, [activeLanguage]: e.target.value }
-                      })}       
+                      })}
                       disabled={isReadonly}
                       className={clsx(
                         'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -348,7 +402,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       Description
                     </label>
                     <textarea
-                      value= {formData?.body || ''}//{formData?.body[activeLanguage] || ''}
+                      value={formData?.body || ''}//{formData?.body[activeLanguage] || ''}
                       onChange={(e) => setFormData({
                         ...formData,
                         body: e.target.value  //{ ...formData?.body, [activeLanguage]: e.target.value }
@@ -372,7 +426,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                   Languages
                 </label>
                 <div className="space-y-2">
-                  {languages?.filter((l)=>l.status===true).map((lang) => (
+                  {languages?.filter((l) => l.status === true).map((lang) => (
                     <div key={lang.locale} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -402,7 +456,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     const hasTitle = formData?.title; //formData?.title[langCode];
                     const hasDescription = formData?.body; //formData?.body[langCode];
                     const isComplete = hasTitle && hasDescription;
-                    
+
                     return (
                       <div key={langCode} className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">{lang?.language || langCode}</span>

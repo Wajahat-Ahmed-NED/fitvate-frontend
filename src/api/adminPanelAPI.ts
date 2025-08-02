@@ -442,6 +442,29 @@ async function deleteLikedArticle(article: Article, adminToken: string | null) {
   }
 }
 
+async function AutoTranslateArticle(
+  text: string,
+  targetLanguage: string,
+  adminToken: string | null
+) {
+  try {
+    return await axios.post(
+      `${api}/admin/translation`,
+      {
+        text: text,
+        targetLanguage: targetLanguage,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      }
+    );
+  } catch (error: any) {
+    errorAlert(error?.response?.data?.message || error?.message);
+  }
+}
+
 export {
   listUsers,
   userProfileById,
@@ -468,4 +491,5 @@ export {
   addLikedArticle,
   adminLogin,
   issueDetail,
+  AutoTranslateArticle
 };
