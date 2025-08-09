@@ -6,8 +6,7 @@ import { AutoTranslateArticle, createArticle, updateArticle } from '../../api/ad
 import Swal from 'sweetalert2';
 import { useAtomValue } from 'jotai';
 import { authTokenAtom } from '../../store/auth';
-// import { translateArticle } from '../../services/translationService';
-// import { TranslationDTO } from '../../types';
+import { set } from 'lodash';
 interface ArticleModalProps {
   article: Article | null;
   mode: 'view' | 'edit' | 'create';
@@ -16,13 +15,20 @@ interface ArticleModalProps {
   onRefresh: () => void;
 }
 
+function safeJSONParse(str: string) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return str;
+  }
+}
+
 export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, languages, onClose, onRefresh }) => {
+  const [selectedActiveLang, setselectedActiveLang] = useState(article?.locale.split(',')[0] || 'en'); // default to first locale
   const adminToken = useAtomValue(authTokenAtom);
-  const [activeLanguage, setActiveLanguage] = useState(article?.locale || 'en');
-  // const [translatedArticle, setTranslatedArticle] = useState<TranslationDTO | null>(null);
+  const [activeLanguage, setActiveLanguage] = useState(selectedActiveLang || 'en');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
-    //article?.languages || ['en']
-    [article?.locale || 'en']
+    [...article?.locale.split(',') || 'en']
   );
   const [formData, setFormData] = useState<Article>({
     id: article?.id || '',
@@ -32,7 +38,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
     status: article?.status || 'Draft',
     topic: article?.topic || '',
     type: article?.type || '',
-    locale: article?.locale || 'en',
+    locale: activeLanguage || 'en',
     createdAt: article?.createdAt || new Date().toISOString(),
     updatedAt: article?.updatedAt || new Date().toISOString(),
     source: article?.source || '',
@@ -61,7 +67,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
 
   const handleAutoTranslate = async () => {
     const matchLanguageName = languages.find(lang => lang.locale === activeLanguage);
-    const articleBody = JSON.stringify({ title: formData?.title || '', body: formData?.body || '' })
+    const articleBody = JSON.stringify({ title: safeJSONParse(article?.title || '')[selectedActiveLang] || '', body: safeJSONParse(article?.body || '')[selectedActiveLang] || '' })
     AutoTranslateArticle(articleBody, matchLanguageName?.language || 'en', adminToken).then((res) => {
       console.log("res data ", res?.data);
       const translatedResponse = JSON.parse(res?.data?.data?.translation)
@@ -87,56 +93,6 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
     })
 
   };
-
-  //  const handleAutoTranslate = async () => {                                                 //TO USE auto-translate service
-  //   const matchLanguageName = languages.find(lang => lang.locale === activeLanguage);
-  //   const article = {
-  //     title: formData?.title || '',
-  //     body: formData?.body || '',
-  //     languagetotranslateto: matchLanguageName?.language  || activeLanguage
-  //   };
-
-  //   const translated = await translateArticle(article);
-  //   // console.log( 'Translated Article:', translated);
-  //   if (!translated) {
-  //     Swal.fire({
-  //       title: 'Error!',
-  //       text: 'Failed to translate article',
-  //       icon: 'error',
-  //       confirmButtonText: 'Okay',
-  //     });
-  //     return;
-  //   }else{
-  //     setFormData({
-  //       ...formData,
-  //       title: translated.title,
-  //       body: translated.body, 
-  //   });
-  //   }
-  // };
-
-  //const handleAutoTranslate = () => {                                         //TO SUPPORT MULTIPLE LANGUAGES
-  // Simulate auto-translation
-  // const englishTitle = formData?.title //formData?.title.en;
-  // const englishDescription = formData?.body;
-
-  // const newTitle = { ...formData?.title };
-  // const newDescription = { ...formData?.body };
-
-  // selectedLanguages?.forEach(langCode => {
-  //   if (langCode !== 'en') {
-  //     // Mock translation - in real app, this would call a translation API
-  //     newTitle[langCode] = `[${langCode.toUpperCase()}] ${englishTitle}`;
-  //     newDescription[langCode] = `[${langCode.toUpperCase()}] ${englishDescription}`;
-  //   }
-  // });
-
-  // setFormData({
-  //   ...formData,
-  //   title: newTitle,
-  //   description: newDescription,
-  // });
-  //};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,9 +141,38 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
         });
         break;
       case 'edit':
+      // Step 1: Parse existing title/body JSON safely
+      let existingTitle: Record<string, string>;
+      let existingBody: Record<string, string>;
 
-        updateArticle(formData, adminToken).then((res) => {
-          if (res?.status == 200) {
+      try {
+        existingTitle = JSON.parse(article?.title || '{}');
+      } catch {
+        existingTitle = { [article?.locale || 'en']: article?.title || '' };
+      }
+
+      try {
+        existingBody = JSON.parse(article?.body || '{}');
+      } catch {
+        existingBody = { [article?.locale || 'en']: article?.body || '' };
+      }
+
+      // Step 2: Add or update the active language content
+      existingTitle[activeLanguage] = formData.title;
+      existingBody[activeLanguage] = formData.body;
+
+      // Step 3: Create updated formData with stringified objects and locales joined by commas
+      const updatedFormData = {
+        ...formData,
+        title: JSON.stringify(existingTitle),
+        body: JSON.stringify(existingBody),
+        locale: selectedLanguages.join(','),
+      };
+
+      // Step 4: Send update request
+      updateArticle(updatedFormData, adminToken)
+        .then((res) => {
+          if (res?.status === 200) {
             Swal.fire({
               title: 'Success!',
               text: `${res?.data?.message || 'Article Updated Successfully'}`,
@@ -202,11 +187,12 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                 confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
               },
               confirmButtonText: 'Okay',
-              buttonsStyling: false, // required to use Tailwind styles
-            })
+              buttonsStyling: false,
+            });
           }
           onRefresh();
-        }).catch((err) => {
+        })
+        .catch((err) => {
           Swal.fire({
             title: 'Error!',
             text: `${err?.data?.message || 'Failed to update Article'}`,
@@ -221,10 +207,10 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
               confirmButton: 'bg-blue-600 shadow-lg hover:bg-blue-700 text-white px-4 py-2 rounded',
             },
             confirmButtonText: 'Okay',
-            buttonsStyling: false, // required to use Tailwind styles
-          })
+            buttonsStyling: false,
+          });
         });
-        break;
+      break;
 
       default:
         break;
@@ -343,11 +329,36 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                     </label>
                     <input
                       type="text"
-                      value={formData?.title || ''} //formData?.title[activeLanguage] 
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        title: e.target.value //{ ...formData?.title, [activeLanguage]: e.target.value }
-                      })}
+                      value={
+                        formData?.title
+                          ? typeof safeJSONParse(formData.title) === 'string'
+                            ? safeJSONParse(formData.title) // plain string
+                            : mode === 'view'?  safeJSONParse(formData.title)[activeLanguage || 'en'] : safeJSONParse(formData.title)[formData?.locale] || ''
+                          : ''
+                      }
+                      //value={formData?.title[0] || ''}
+                      //value= {formData?.title[activeLanguage]}
+                      // onChange={(e) => setFormData({
+                      //   ...formData,
+                      //   // title: e.target.value //{ ...formData?.title, [activeLanguage]: e.target.value }
+                      //   title: JSON.stringify({ ...(JSON.parse(formData?.title)), [activeLanguage]: e.target.value })
+                      // })}
+                      onChange={(e) => {
+                        const newTitle = e.target.value;
+                        setFormData((prev) => ({
+                          ...prev,
+                          title: (() => {
+                            let parsed: Record<string, string>;
+                            try {
+                              parsed = JSON.parse(prev.title || '{}');
+                            } catch {
+                              parsed = {};
+                            }
+                            parsed[activeLanguage] = newTitle;
+                            return JSON.stringify(parsed);
+                          })(),
+                        }));
+                      }}
                       disabled={isReadonly}
                       className={clsx(
                         'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -402,11 +413,35 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, mode, langu
                       Description
                     </label>
                     <textarea
-                      value={formData?.body || ''}//{formData?.body[activeLanguage] || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        body: e.target.value  //{ ...formData?.body, [activeLanguage]: e.target.value }
-                      })}
+                      // value={formData?.body || ''}//{formData?.body[activeLanguage] || ''}
+                      value={
+                        formData?.body
+                          ? typeof safeJSONParse(formData.body) === 'string'
+                            ? safeJSONParse(formData.body) // plain string
+                            : safeJSONParse(formData.body)[activeLanguage || 'en'] || ''
+                          : ''
+                      }
+                      // onChange={(e) => setFormData({
+                      //   ...formData,
+                      //   // body: e.target.value  //{ ...formData?.body, [activeLanguage]: e.target.value }
+                      //   body: JSON.stringify({ ...(JSON.parse(formData?.body)), [activeLanguage]: e.target.value })
+                      // })}
+                      onChange={(e) => {
+                        const newBody = e.target.value;
+                        setFormData((prev) => ({
+                          ...prev,
+                          body: (() => {
+                            let parsed: Record<string, string>;
+                            try {
+                              parsed = JSON.parse(prev.body || '{}');
+                            } catch {
+                              parsed = {};
+                            }
+                            parsed[activeLanguage] = newBody;
+                            return JSON.stringify(parsed);
+                          })(),
+                        }));
+                      }}
                       disabled={isReadonly}
                       rows={6}
                       className={clsx(

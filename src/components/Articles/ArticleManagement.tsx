@@ -297,10 +297,10 @@ export const ArticleManagement: React.FC = () => {
                       />
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
-                          {article?.title || Object.values(article?.title)[0]}
+                          {JSON.parse(article?.title)[selectedLanguage] || Object.values(JSON.parse(article?.title))[0]}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {(article?.body || Object.values(article?.body)[0])?.substring(0, 50)}...
+                          {JSON.parse(article?.body)[selectedLanguage] || Object.values(JSON.parse(article?.body))[0]}
                         </div>
                       </div>
                     </div>
