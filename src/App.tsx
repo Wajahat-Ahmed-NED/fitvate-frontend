@@ -26,7 +26,7 @@ function App() {
                 <Sidebar />
                 <div className="flex-1 flex flex-col overflow-hidden">
                   <Header />
-                  <main className="flex-1 overflow-y-auto bg-gray-50">
+                  <main className="flex-1 overflow-y-auto bg-gray-50 ">
                     <Routes>
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/users" element={<UserManagement />} />
